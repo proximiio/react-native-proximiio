@@ -35,6 +35,25 @@ cd ios
 pod install
 ```
 
+For IOS its necessary to configure location permissions
+
+- switch to 'Capabilities' tab, enable 'Background Modes' and enable both 'Location Updates' & 'Uses Bluetooth LE accessories' to allow beacon operation while application is in background
+- locate 'Info.plist' file belonging to the project, right-click it and select 'Open As' -> 'Source File'
+- copy & paste following lines to the bottom of the Info.plist file, but above the last '/<dict></dict></plist>' lines, modify the text to suit your application
+
+```diff
++  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
++  <string>Allow Background Location updates for Event triggering while the App is in background</string>
++  <key>NSLocationWhenInUseUsageDescription</key>
++  <string>Allow Location Updates for basic Proximi.io SDK operation</string>
++  <key>NSLocationAlwaysUsageDescription</key>
++  <string>Allow always usage for permanent positioning support</string>
++  <key>NSMotionUsageDescription</key>
++  <string>Allow motion detection for improved positioning</string>
++  <key>NSBluetoothPeripheralUsageDescription</key>
++  <string>Allow bluetooth for improved beacon operation</string>
+```
+
 # Usage
 
 ## General
