@@ -6,6 +6,7 @@ import Proximiio, {
   ProximiioLocation,
   NativeAccuracy,
   ProximiioGeofence,
+  ProximiioInitState,
 } from 'react-native-proximiio';
 
 const TOKEN = 'insert-proximiio-token-here';
@@ -20,7 +21,7 @@ export default function App() {
   } as ProximiioLocation);
   const [geofences, setGeofences] = React.useState([] as ProximiioGeofence[]);
 
-  const onProximiioInit = (state: any) => {
+  const onProximiioInit = (state: ProximiioInitState) => {
     setVisitorId(state.visitorId);
 
     Proximiio.subscribe(ProximiioEvents.FloorChanged, setFloor);
@@ -35,9 +36,9 @@ export default function App() {
       setGeofences(current);
     };
 
+    Proximiio.requestPermissions();
     Proximiio.subscribe(ProximiioEvents.EnteredGeofence, updateGeofences);
     Proximiio.subscribe(ProximiioEvents.ExitedGeofence, updateGeofences);
-    Proximiio.requestPermissions();
     Proximiio.setNativeAccuracy(NativeAccuracy.GPS);
   };
 

@@ -9,6 +9,7 @@
     "start": "react-native start"
   },
   "dependencies": {
+    "@react-native-community/cli-platform-android": "^4.6.0",
     "react": "16.9.0",
     "react-native": "0.61.5"
   },
