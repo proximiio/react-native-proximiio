@@ -109,6 +109,10 @@ export class Proximiio {
     return ProximiioNative.getDepartments();
   }
 
+  getDepartment(id: string): Promise<ProximiioDepartment> {
+    return ProximiioNative.getDepartment(id);
+  }
+
   getFloor(id: string): Promise<ProximiioFloor | null> {
     return ProximiioNative.getFloor(id);
   }
