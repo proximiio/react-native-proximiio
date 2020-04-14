@@ -42,18 +42,34 @@ For IOS its necessary to configure location permissions
 - copy & paste following lines to the bottom of the Info.plist file, but above the last '/<dict></dict></plist>' lines, modify the text to suit your application
 
 ```diff
-+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-+  <string>Allow Background Location updates for Event triggering while the App is in background</string>
-+  <key>NSLocationWhenInUseUsageDescription</key>
-+  <string>Allow Location Updates for basic Proximi.io SDK operation</string>
-+  <key>NSLocationAlwaysUsageDescription</key>
-+  <string>Allow always usage for permanent positioning support</string>
-+  <key>NSMotionUsageDescription</key>
-+  <string>Allow motion detection for improved positioning</string>
-+  <key>NSBluetoothPeripheralUsageDescription</key>
-+  <string>Allow bluetooth for improved beacon operation</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>Allow Background Location updates for Event triggering while the App is in background</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Allow Location Updates for basic Proximi.io SDK operation</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>Allow always usage for permanent positioning support</string>
+<key>NSMotionUsageDescription</key>
+<string>Allow motion detection for improved positioning</string>
+<key>NSBluetoothPeripheralUsageDescription</key>
+<string>Allow bluetooth for improved beacon operation</string>
 ```
 
+For android add following code at end of appliction build.gradle file
+```
+allprojects {
+    repositories {
+        maven {
+            url "http://proximi-io.bintray.com/proximiio-android"
+        }
+        maven {
+            url "http://indooratlas-ltd.bintray.com/mvn-public"
+        }
+        maven {
+            url 'https://maven.google.com'
+        }
+    }
+}
+```
 # Usage
 
 ## General
