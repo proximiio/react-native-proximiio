@@ -10,7 +10,8 @@ import com.facebook.react.uimanager.ViewManager
 import com.facebook.react.bridge.JavaScriptModule
 
 class ProximiioPackage : ReactPackage {
-    val proximiioModule: ProximiioModule
+    lateinit var proximiioModule: RNProximiioReactModule
+
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
         if (proximiioModule == null) {
           proximiioModule = RNProximiioReactModule(reactContext);
@@ -29,4 +30,3 @@ class ProximiioPackage : ReactPackage {
     // }
 }
 
-z

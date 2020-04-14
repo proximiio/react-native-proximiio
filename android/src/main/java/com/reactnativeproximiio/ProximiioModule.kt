@@ -2,16 +2,6 @@ package com.reactnativeproximiio;
 
 import android.app.Activity
 import android.content.Intent
-import com.facebook.react.bridge.ActivityEventListener
-import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.LifecycleEventListener
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.WritableArray
-import com.facebook.react.bridge.WritableMap
-import com.facebook.react.modules.core.DeviceEventManagerModule
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -25,6 +15,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import io.proximi.proximiiolibrary.*
 
 class RNProximiioReactModule internal constructor(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener {
     private val options: ProximiioOptions
@@ -100,8 +91,7 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
         map.putDouble("lng", lon)
         map.putDouble("accuracy", accuracy)
         if (type != null) {
-            var typeString = ""
-            typeString = if (type == ProximiioGeofence.EventType.NATIVE) {
+            var typeString = if (type == ProximiioGeofence.EventType.NATIVE) {
                 "native"
             } else if (type == ProximiioGeofence.EventType.BEACON) {
                 "beacon"
@@ -153,7 +143,7 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
             map.putInt("major", beacon.major)
             map.putInt("minor", beacon.minor)
             if (beacon != null && beacon.distance != null) {
-                map.putDouble("accuracy", beacon.distance)
+                map.putDouble("accuracy", beacon.distance!!)
             } else {
                 map.putDouble("accuracy", 50.0)
             }
@@ -183,7 +173,7 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
             map.putString("id", floor.id)
             map.putString("name", floor.name)
             if (floor.floorNumber != null) {
-                map.putInt("level", floor.floorNumber)
+                map.putInt("level", floor.floorNumber!!)
             } else {
                 map.putInt("level", 0)
             }
@@ -277,7 +267,7 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
                 if (authPromise != null && online) {
                     val map: WritableMap = Arguments.createMap()
                     map.putString("visitorId", proximiioAPI!!.visitorID)
-                    authPromise.resolve(map)
+                    authPromise!!.resolve(map)
                     val initMap: WritableMap = Arguments.createMap()
                     initMap.putString("visitorId", proximiioAPI!!.visitorID)
                     initMap.putBoolean("ready", true)
@@ -288,9 +278,9 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
             override fun loginFailed(error: LoginError) {
                 if (authPromise != null) {
                     if (error == LoginError.LOGIN_FAILED) {
-                        authPromise.reject("403", "Proximi.io authorization failed")
+                        authPromise!!.reject("403", "Proximi.io authorization failed")
                     } else {
-                        authPromise.reject("404", "Proximi.io connection failed")
+                        authPromise!!.reject("404", "Proximi.io connection failed")
                     }
                 }
             }
@@ -317,21 +307,21 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
         }
     }
 
-    fun onHostResume() {
+    override fun onHostResume() {
         if (proximiioAPI != null) {
             trySetActivity()
             proximiioAPI!!.onStart()
         }
     }
 
-    fun onHostPause() {
+    override fun onHostPause() {
         if (proximiioAPI != null) {
             proximiioAPI!!.setActivity(null)
             proximiioAPI!!.onStop()
         }
     }
 
-    fun onHostDestroy() {
+    override fun onHostDestroy() {
         if (proximiioAPI != null) {
             proximiioAPI!!.destroy()
         }
@@ -344,39 +334,36 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
         // super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    val name: String
-        get() = "ProximiioNative"
-
-    val constants: Map<String, Any>?
-        get() {
-            val constants = HashMap<String, Any>()
-            for (mode in ProximiioOptions.NotificationMode.values()) {
-                constants["NOTIFICATION_MODE_$mode"] = mode.toInt()
-            }
-            return constants
-        }
+//    val constants: Map<String, Any>?
+//        get() {
+//            val constants = HashMap<String, Any>()
+//            for (mode in ProximiioOptions.NotificationMode.values()) {
+//                constants["NOTIFICATION_MODE_$mode"] = mode.toInt()
+//            }
+//            return constants
+//        }
 
     private fun sendEvent(event: String, data: Any) {
         if (emitter == null) {
             emitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
         }
-        emitter.emit(event, data)
+        emitter!!.emit(event, data)
     }
 
     private fun trySetActivity() {
-        val activity: Activity = getCurrentActivity()
+        val activity: Activity? = getCurrentActivity()
         if (activity != null) {
             proximiioAPI!!.setActivity(activity)
         }
     }
 
-    fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
         if (proximiioAPI != null) {
             proximiioAPI!!.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    fun onNewIntent(intent: Intent?) {}
+    override fun onNewIntent(intent: Intent?) {}
 
     companion object {
         private const val TAG = "ProximiioReact"
@@ -398,5 +385,9 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
         reactContext.addLifecycleEventListener(this)
         reactContext.addActivityEventListener(this)
         options = ProximiioOptions()
+    }
+
+    override fun getName(): String {
+        return "ProximiioNative"
     }
 }

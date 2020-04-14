@@ -1,9 +1,3 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.reactnativeproximiio">
-
-  <receiver android:name=".BackgroundReceiver"  android:exported="false">
-      <intent-filter>
-          <action android:name="io.proximi.proximiiolibrary.action.POSITION"/>
-      </intent-filter>
-  </receiver>
 </manifest>
