@@ -1,6 +1,6 @@
+import React, { useEffect, useState, PropsWithChildren } from 'react'
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 const { ProximiioNative } = NativeModules;
-import { ProximiioContextProvider, ProximiioContext } from './context';
 
 import {
   ProximiioContextType,
@@ -210,8 +210,6 @@ const instance = new Proximiio();
 export default instance;
 
 export {
-  ProximiioContext,
-  ProximiioContextProvider,
   ProximiioContextType,
   ProximiioInitState,
   ProximiioFloor,
@@ -219,4 +217,32 @@ export {
   ProximiioDepartment,
   ProximiioPlace,
   ProximiioLocation,
+};
+
+export const ProximiioContext = React.createContext(instance.getContext());
+
+export const ProximiioContextProvider = ({
+  children,
+}: PropsWithChildren<{}>) => {
+  const [context, setContext] = useState({} as ProximiioContextType);
+
+  useEffect(() => {
+    const contextSetter = () => {
+      setContext(instance.getContext());
+    };
+
+    instance.subscribe(ProximiioEvents.PositionUpdated, contextSetter);
+    instance.subscribe(ProximiioEvents.FloorChanged, contextSetter);
+
+    return () => {
+      instance.unsubscribe(ProximiioEvents.PositionUpdated, contextSetter);
+      instance.unsubscribe(ProximiioEvents.FloorChanged, contextSetter);
+    };
+  }, []);
+
+  return (
+    <ProximiioContext.Provider value={context}>
+      {children}
+    </ProximiioContext.Provider>
+  );
 };
