@@ -1,4 +1,4 @@
-import React, { useEffect, useState, PropsWithChildren } from 'react'
+import React, { useEffect, useState, PropsWithChildren } from 'react';
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 const { ProximiioNative } = NativeModules;
 
