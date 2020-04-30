@@ -228,7 +228,7 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
 RCT_EXPORT_METHOD(requestPermissions) {
   NSLog(@"native > requesting permissions");
   dispatch_sync(dispatch_get_main_queue(),^ {
-    [[Proximiio sharedInstance] requestPermissions];
+    [[Proximiio sharedInstance] requestPermissions:true];
   });
   NSLog(@"native > requesting permissions done");
 }
