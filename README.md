@@ -28,14 +28,24 @@ Run the following inside the project folder to install the library:
 npm install https://github.com/proximiio/react-native-proximiio
 ```
 
-After the installation is finished, enter the ios directory and run pod install
+After the installation is finished, edit the Podfile in ios directory and increase the deployment target at first line:
+```
+platform :ios, '9.0'
+```
+
+to
+
+```
+platform :ios, '12.0'
+```
+
+After that run "pod install" command in the ios directory
 
 ```bash
-cd ios
 pod install
 ```
 
-For IOS its necessary to configure location permissions
+For IOS its also necessary to configure location permissions
 
 - switch to 'Capabilities' tab, enable 'Background Modes' and enable both 'Location Updates' & 'Uses Bluetooth LE accessories' to allow beacon operation while application is in background
 - locate 'Info.plist' file belonging to the project, right-click it and select 'Open As' -> 'Source File'
