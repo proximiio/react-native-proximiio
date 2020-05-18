@@ -64,10 +64,21 @@ For IOS its also necessary to configure location permissions
 <string>Allow bluetooth for improved beacon operation</string>
 ```
 
-For android add following code at end of appliction build.gradle file
+For android edit your appliction build.gradle file, minSdkVersion needs to be 19 or higher and new repositories need to be added for proper installation.
 ```
+...
+buildscript {
+    ext {
+        buildToolsVersion = "28.0.3"
+        minSdkVersion = 19
+        compileSdkVersion = 28
+        targetSdkVersion = 28
+    }
+...
+
 allprojects {
     repositories {
+        ...
         maven {
             url "http://proximi-io.bintray.com/proximiio-android"
         }
@@ -80,6 +91,9 @@ allprojects {
     }
 }
 ```
+
+Edit app/src/main/AndroidManifest.xml and set android:allowBackup="true"
+
 # Usage
 
 ## General
