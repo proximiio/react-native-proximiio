@@ -1,5 +1,5 @@
+import React from 'react';
 import { NativeEventEmitter } from 'react-native';
-import { ProximiioContextProvider, ProximiioContext } from './context';
 import { ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation } from './types';
 export declare enum BufferSize {
     MINI = 0,
@@ -47,6 +47,7 @@ export declare class Proximiio {
     currentGeofences(): Promise<ProximiioGeofence[]>;
     getContext: () => ProximiioContextType;
     departments(): Promise<ProximiioDepartment[]>;
+    getDepartment(id: string): Promise<ProximiioDepartment>;
     getFloor(id: string): Promise<ProximiioFloor | null>;
     floors(): Promise<ProximiioFloor[]>;
     getGeofence(id: string): Promise<ProximiioGeofence | null>;
@@ -69,4 +70,8 @@ export declare class Proximiio {
 }
 declare const instance: Proximiio;
 export default instance;
-export { ProximiioContext, ProximiioContextProvider, ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation, };
+export { ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation, };
+export declare const ProximiioContext: React.Context<ProximiioContextType>;
+export declare const ProximiioContextProvider: ({ children, }: {
+    children?: React.ReactNode;
+}) => JSX.Element;

@@ -196,7 +196,6 @@
 
 - (void)_sendEventWithName:(NSString *)event body:(id)body {
     if (hasListeners) {
-//        NSLog(@"sending event: %@ with  body: %@", event, body);
         [self sendEventWithName:event body:body];
     }
 }
@@ -226,11 +225,9 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
 }
 
 RCT_EXPORT_METHOD(requestPermissions) {
-  NSLog(@"native > requesting permissions");
   dispatch_sync(dispatch_get_main_queue(),^ {
-    [[Proximiio sharedInstance] requestPermissions];
+    [[Proximiio sharedInstance] requestPermissions:true];
   });
-  NSLog(@"native > requesting permissions done");
 }
 
 RCT_EXPORT_METHOD(disable) {
@@ -239,6 +236,10 @@ RCT_EXPORT_METHOD(disable) {
 
 RCT_EXPORT_METHOD(enable) {
   [[Proximiio sharedInstance] enable];
+}
+
+RCT_EXPORT_METHOD(destroy) {
+  [[Proximiio sharedInstance] disable];
 }
 
 RCT_EXPORT_METHOD(setBufferSize:(nonnull NSNumber *) bufferSize) {

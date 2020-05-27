@@ -2,6 +2,7 @@ package com.reactnativeproximiio;
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -287,7 +288,6 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
         })
         proximiioAPI!!.setAuth(auth!!, true)
         trySetActivity()
-        proximiioAPI!!.onStart()
     }
 
     @ReactMethod
@@ -310,7 +310,6 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
     override fun onHostResume() {
         if (proximiioAPI != null) {
             trySetActivity()
-            proximiioAPI!!.onStart()
         }
     }
 
@@ -350,10 +349,12 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
         emitter!!.emit(event, data)
     }
 
-    private fun trySetActivity() {
+    @ReactMethod
+    fun trySetActivity() {
         val activity: Activity? = getCurrentActivity()
         if (activity != null) {
             proximiioAPI!!.setActivity(activity)
+            proximiioAPI!!.onStart()
         }
     }
 
@@ -361,6 +362,12 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
         if (proximiioAPI != null) {
             proximiioAPI!!.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+
+    override fun onCatalystInstanceDestroy() {
+        Log.d("ProximiioModule", "onCatalystInstanceDestroy")
+        super.onCatalystInstanceDestroy()
     }
 
     override fun onNewIntent(intent: Intent?) {}
