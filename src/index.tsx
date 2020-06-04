@@ -202,7 +202,11 @@ export class Proximiio {
   }
 
   destroy(erase: boolean) {
-    ProximiioNative.destroy(erase);
+    if (Platform.OS === 'android') {
+      ProximiioNative.destroy(erase);
+    } else {
+      ProximiioNative.destroy();
+    }
   }
 }
 
