@@ -308,9 +308,9 @@ class RNProximiioReactModule internal constructor(reactContext: ReactApplication
     }
 
     override fun onHostResume() {
-        if (proximiioAPI != null) {
-            trySetActivity()
-        }
+//         if (proximiioAPI != null) {
+//             trySetActivity()
+//         }
     }
 
     override fun onHostPause() {

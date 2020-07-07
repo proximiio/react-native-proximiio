@@ -1,6 +1,6 @@
 {
   "name": "react-native-proximiio",
-  "version": "5.0.0",
+  "version": "5.0.3",
   "description": "Proximiio.SDK Library",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -122,5 +122,7 @@
       "module",
       "typescript"
     ]
+  },
+  "dependencies": {
   }
 }
