@@ -52,7 +52,7 @@
     "metro-react-native-babel-preset": "^0.59.0",
     "prettier": "^1.19.1",
     "release-it": "^12.6.3",
-    "typescript": "^3.7.5"
+    "typescript": "^3.9.2"
   },
   "peerDependencies": {
     "react": "*",
@@ -123,6 +123,5 @@
       "typescript"
     ]
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
