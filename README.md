@@ -16,7 +16,7 @@ Welcome to the Proximi.io React Native Library, this library provides indoor pos
 
 # Version
 
-Current public version is: `2.0.0`
+Current public version is: `5.0.3`
 
 # Installation
 
