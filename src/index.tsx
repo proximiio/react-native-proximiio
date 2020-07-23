@@ -148,15 +148,11 @@ export class Proximiio {
   }
 
   enable() {
-    if (Platform.OS === 'ios') {
-      ProximiioNative.enable();
-    }
+    ProximiioNative.enable();
   }
 
   disable() {
-    if (Platform.OS === 'ios') {
-      ProximiioNative.disable();
-    }
+    ProximiioNative.disable();
   }
 
   subscribe(event: string, fn: (data: any) => void) {

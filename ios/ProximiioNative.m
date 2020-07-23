@@ -34,11 +34,16 @@
 }
 
 - (NSDictionary *)convertLocation:(ProximiioLocation *)location {
+    
     NSMutableDictionary *data = @{
       @"lat": @(location.coordinate.latitude),
       @"lng": @(location.coordinate.longitude),
-      @"sourceType": location.sourceType
+      
     }.mutableCopy;
+    
+    if (location.sourceType != nil) {
+        data[@"sourceType"] = location.sourceType;
+    }
 
     if (location.horizontalAccuracy > 0) {
         [data setValue:@(location.horizontalAccuracy) forKey:@"accuracy"];
@@ -47,14 +52,43 @@
     return data;
 }
 
+- (NSDictionary *)convertDepartment:(ProximiioDepartment *)department {
+    return @{
+      @"id": department.uuid,
+      @"name": department.name,
+      @"place_id": department.placeId,
+      @"floor_id": department.floorId
+    };
+}
+
 - (NSDictionary *)convertFloor:(ProximiioFloor *)floor {
+    NSMutableArray *anchors = [NSMutableArray array];
+    for (ProximiioLocation *location in floor.anchors) {
+        [anchors addObject:[self convertLocation:location]];
+    }
     return @{
       @"id": floor.uuid,
       @"name": floor.name,
       @"level": floor.level,
       @"place_id": floor.placeId,
       @"floorplan": floor.floorPlanImageURL,
-      @"anchors": floor.anchors
+      @"anchors": anchors
+    };
+}
+
+- (NSDictionary *)convertLatLng:(NSDictionary *)anchor {
+    return @{
+        @"lat": anchor[@"lat"],
+        @"lng": anchor[@"lng"]
+    };
+}
+
+- (NSDictionary *)convertPlace:(ProximiioPlace *)place {
+    return @{
+      @"id": place.uuid,
+      @"name": place.name,
+      @"location": [self convertLocation:place.location],
+      @"tags": place.tags,
     };
 }
 
@@ -222,6 +256,36 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
                                           }
                                       }];
     });
+}
+
+RCT_EXPORT_METHOD(getPlaces:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_sync(dispatch_get_main_queue(),^ {
+      NSMutableArray *places = [NSMutableArray array];
+      for (ProximiioPlace *place in [[Proximiio sharedInstance] places]) {
+          [places addObject:[self convertPlace:place]];
+      }
+      resolve(places);
+  });
+}
+
+RCT_EXPORT_METHOD(getFloors:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_sync(dispatch_get_main_queue(),^ {
+      NSMutableArray *floors = [NSMutableArray array];
+      for (ProximiioFloor *floor in [[Proximiio sharedInstance] floors]) {
+          [floors addObject:[self convertFloor:floor]];
+      }
+      resolve(floors);
+  });
+}
+
+RCT_EXPORT_METHOD(getDepartments:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_sync(dispatch_get_main_queue(),^ {
+      NSMutableArray *departments = [NSMutableArray array];
+      for (ProximiioDepartment *department in [[Proximiio sharedInstance] departments]) {
+          [departments addObject:[self convertDepartment:department]];
+      }
+      resolve(departments);
+  });
 }
 
 RCT_EXPORT_METHOD(requestPermissions) {
