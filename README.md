@@ -16,7 +16,7 @@ Welcome to the Proximi.io React Native Library, this library provides indoor pos
 
 # Version
 
-Current public version is: `5.0.3`
+Current public version is: `5.0.4`
 
 # Installation
 
@@ -65,14 +65,15 @@ For IOS its also necessary to configure location permissions
 ```
 
 For android edit your appliction build.gradle file, minSdkVersion needs to be 19 or higher and new repositories need to be added for proper installation.
+Since Version 5.0.4, compileSdkVersion and targetSdkVersion need to be 29 at least.
 ```
 ...
 buildscript {
     ext {
         buildToolsVersion = "28.0.3"
         minSdkVersion = 19
-        compileSdkVersion = 28
-        targetSdkVersion = 28
+        compileSdkVersion = 29
+        targetSdkVersion = 29
     }
 ...
 
