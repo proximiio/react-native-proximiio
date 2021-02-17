@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import io.proximi.proximiiolibrary.*
 
-class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener {
+class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener, PermissionListener {
     private val options: ProximiioOptions
     private var proximiioAPI: ProximiioAPI? = null
     private var emitter: DeviceEventManagerModule.RCTDeviceEventEmitter? = null
@@ -496,6 +496,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     @ReactMethod
     fun trySetActivity() {
+        (currentActivity as PermissionAwareActivity).requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), ProximiioAPI.PERMISSION_REQUEST, this);
         proximiioAPI?.setActivity(currentActivity)
         proximiioAPI?.onStart()
     }
