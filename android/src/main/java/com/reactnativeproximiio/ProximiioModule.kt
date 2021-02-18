@@ -1,5 +1,6 @@
 package com.reactnativeproximiio
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
@@ -7,6 +8,8 @@ import com.facebook.react.bridge.*
 import java.util.concurrent.CopyOnWriteArrayList
 
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import com.facebook.react.modules.core.PermissionAwareActivity
+import com.facebook.react.modules.core.PermissionListener
 import io.proximi.proximiiolibrary.*
 
 class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener, PermissionListener {
