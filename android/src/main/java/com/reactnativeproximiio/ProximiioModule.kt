@@ -464,12 +464,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         proximiioAPI?.destroy()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray): Boolean {
         if (proximiioAPI != null) {
             proximiioAPI!!.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
-        // super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        return true;
     }
+
 
 //    val constants: Map<String, Any>?
 //        get() {
