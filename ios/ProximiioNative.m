@@ -3,6 +3,7 @@
 
 @implementation ProximiioNative  {
     bool hasListeners;
+    Proximiio *instance;
 }
 
 - (void)startObserving {
@@ -176,9 +177,9 @@
 
 - (void)proximiioPositionUpdated:(ProximiioLocation *)location {
     NSMutableDictionary *body = [[self convertLocation:location] mutableCopy];
-    ProximiioFloor *floor = [Proximiio sharedInstance].currentFloor;
+    ProximiioFloor *floor = instance.currentFloor;
     if (floor != nil) {
-      [body setValue:[self convertFloor:[Proximiio sharedInstance].currentFloor] forKey:@"floor"];
+      [body setValue:[self convertFloor:instance.currentFloor] forKey:@"floor"];
     }
 
     [self _sendEventWithName:@"ProximiioPositionUpdated" body:[self convertLocation:location]];
@@ -240,28 +241,29 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
       authWithTokenwithResolver:(RCTPromiseResolveBlock)resolve
                        rejecter:(RCTPromiseRejectBlock)reject) {
     dispatch_sync(dispatch_get_main_queue(),^ {
-      [Proximiio sharedInstance].delegate = self;
-      [[Proximiio sharedInstance] authWithToken:token
-                                      callback:^(ProximiioState result) {
-                                          if (result == kProximiioReady) {
-                                              NSDictionary *state = @{
-                                                @"visitorId": [Proximiio sharedInstance].visitorId,
-                                                @"ready": @true
-                                              };
-                                              resolve(state);
-                                              [self _sendEventWithName:@"ProximiioInitialized" body:state];
-                                          } else {
-                                              NSError *error = [[NSError alloc] initWithDomain:NSURLErrorDomain code:403 userInfo:nil];
-                                              reject(@"403", @"Proximi.io authorization failed", error);
-                                          }
-                                      }];
+        instance = [Proximiio sharedInstance];
+        instance.delegate = self;
+        [instance authWithToken:token
+                       callback:^(ProximiioState result) {
+                          if (result == kProximiioReady) {
+                              NSDictionary *state = @{
+                                @"visitorId": self->instance.visitorId,
+                                @"ready": @true
+                              };
+                              resolve(state);
+                              [self _sendEventWithName:@"ProximiioInitialized" body:state];
+                          } else {
+                              NSError *error = [[NSError alloc] initWithDomain:NSURLErrorDomain code:403 userInfo:nil];
+                              reject(@"403", @"Proximi.io authorization failed", error);
+                          }
+                      }];
     });
 }
 
 RCT_EXPORT_METHOD(getPlaces:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_sync(dispatch_get_main_queue(),^ {
       NSMutableArray *places = [NSMutableArray array];
-      for (ProximiioPlace *place in [[Proximiio sharedInstance] places]) {
+      for (ProximiioPlace *place in [instance places]) {
           [places addObject:[self convertPlace:place]];
       }
       resolve(places);
@@ -271,7 +273,7 @@ RCT_EXPORT_METHOD(getPlaces:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromise
 RCT_EXPORT_METHOD(getFloors:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_sync(dispatch_get_main_queue(),^ {
       NSMutableArray *floors = [NSMutableArray array];
-      for (ProximiioFloor *floor in [[Proximiio sharedInstance] floors]) {
+      for (ProximiioFloor *floor in [instance floors]) {
           [floors addObject:[self convertFloor:floor]];
       }
       resolve(floors);
@@ -281,33 +283,33 @@ RCT_EXPORT_METHOD(getFloors:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromise
 RCT_EXPORT_METHOD(getDepartments:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_sync(dispatch_get_main_queue(),^ {
       NSMutableArray *departments = [NSMutableArray array];
-      for (ProximiioDepartment *department in [[Proximiio sharedInstance] departments]) {
+      for (ProximiioDepartment *department in [instance departments]) {
           [departments addObject:[self convertDepartment:department]];
       }
       resolve(departments);
   });
 }
 
-RCT_EXPORT_METHOD(requestPermissions) {
+RCT_EXPORT_METHOD(requestPermissions:(nonnull NSNumber *) always) {
   dispatch_sync(dispatch_get_main_queue(),^ {
-    [[Proximiio sharedInstance] requestPermissions:true];
+    [instance requestPermissions:always];
   });
 }
 
 RCT_EXPORT_METHOD(disable) {
-  [[Proximiio sharedInstance] disable];
+  [instance disable];
 }
 
 RCT_EXPORT_METHOD(enable) {
-  [[Proximiio sharedInstance] enable];
+  [instance enable];
 }
 
 RCT_EXPORT_METHOD(destroy) {
-  [[Proximiio sharedInstance] disable];
+  [instance disable];
 }
 
 RCT_EXPORT_METHOD(setBufferSize:(nonnull NSNumber *) bufferSize) {
-  [[Proximiio sharedInstance] setBufferSize:bufferSize.intValue];
+  [instance setBufferSize:bufferSize.intValue];
 }
 
 RCT_EXPORT_METHOD(setNativeAccuracy:(nonnull NSNumber *) accuracyLevel) {
@@ -322,13 +324,13 @@ RCT_EXPORT_METHOD(setNativeAccuracy:(nonnull NSNumber *) accuracyLevel) {
     accuracy = kCLLocationAccuracyBest;
   }
 
-  [[Proximiio sharedInstance] setDesiredAccuracy:accuracy];
+  [instance setDesiredAccuracy:accuracy];
 }
 
 RCT_EXPORT_METHOD(currentGeofences:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
   NSMutableArray *geofences = [NSMutableArray array];
-  for (ProximiioGeofence *geofence in [Proximiio sharedInstance].lastGeofences) {
+  for (ProximiioGeofence *geofence in instance.lastGeofences) {
     [geofences addObject:[self convertGeofence:geofence]];
   }
 
@@ -337,17 +339,18 @@ RCT_EXPORT_METHOD(currentGeofences:(RCTPromiseResolveBlock)resolve
 
 RCT_EXPORT_METHOD(visitorId:(RCTPromiseResolveBlock)resolve
                    rejecter:(RCTPromiseRejectBlock)reject) {
-    resolve([Proximiio sharedInstance].visitorId);
+    resolve(instance.visitorId);
 }
 
 RCT_EXPORT_METHOD(currentFloor:(RCTPromiseResolveBlock)resolve
                       rejecter:(RCTPromiseRejectBlock)reject) {
-    ProximiioFloor *floor = [Proximiio sharedInstance].currentFloor;
+    ProximiioFloor *floor = instance.currentFloor;
     if (floor != nil) {
-      resolve([self convertFloor:[Proximiio sharedInstance].currentFloor]);
+      resolve([self convertFloor:instance.currentFloor]);
     } else {
       resolve(nil);
     }
 }
 
 @end
+
