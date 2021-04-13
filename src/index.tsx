@@ -143,8 +143,10 @@ export class Proximiio {
     }
   }
 
-  requestPermissions() {
-    ProximiioNative.requestPermissions();
+  requestPermissions(useAlways = true) {
+    if (Platform.OS === 'ios') {
+      ProximiioNative.requestPermissions(useAlways);
+    }
   }
 
   enable() {

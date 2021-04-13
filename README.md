@@ -16,7 +16,7 @@ Welcome to the Proximi.io React Native Library, this library provides indoor pos
 
 # Version
 
-Current public version is: `5.0.5`
+Current public version is: `5.0.8`
 
 # Installation
 
@@ -242,8 +242,14 @@ export () => {
 ### Proximiio.authorize(token: string) -> void
 authorizes Proximi.io SDK
 
-### Proximiio.requestPermissions() -> void
-requests location permissions from user if necessary
+### Proximiio.requestPermissions(useAlways?: boolean) -> void
+this method is relevant for IOS only
+
+useAlways parameter is *optional* and defaults to *true*
+
+If your application is fine with "When in Use" permission only, call:
+Proximiio.requestPermissions(false);
+
 
 ### Proximiio.enable(): void 
 enables Proximi.io positioning engine
