@@ -3,6 +3,7 @@ package com.reactnativeproximiio
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.util.Log
 import com.facebook.react.bridge.*
 import java.util.concurrent.CopyOnWriteArrayList
@@ -506,6 +507,19 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         proximiioAPI?.onStart()
     }
 
+    @ReactMethod
+    fun onPermissionResult(granted: Int) {
+        var grantResults = IntArray(1);
+        if (proximiioAPI != null) {
+            if (granted == 0) {
+                grantResults[0] = PackageManager.PERMISSION_DENIED;
+            } else {
+                grantResults[0] = PackageManager.PERMISSION_GRANTED;
+            }
+            proximiioAPI!!.onRequestPermissionsResult(ProximiioAPI.PERMISSION_REQUEST, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), grantResults)
+        }
+    }
+  
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
         if (proximiioAPI != null) {
             proximiioAPI!!.onActivityResult(requestCode, resultCode, data)
