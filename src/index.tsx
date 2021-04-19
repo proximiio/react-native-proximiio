@@ -143,9 +143,15 @@ export class Proximiio {
     }
   }
 
-  requestPermissions(useAlways = true) {
+  requestPermissions() {
     if (Platform.OS === 'ios') {
-      ProximiioNative.requestPermissions(useAlways);
+      ProximiioNative.requestPermissions(false);
+    }
+  }
+
+  onPermissionResult(granted: boolean) {
+    if (Platform.OS === 'android') {
+      ProximiioNative.onPermissionResult(granted ? 1 : 0)
     }
   }
 
