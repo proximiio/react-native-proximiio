@@ -350,7 +350,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                     it.id === floor.id
                 }
 
-                floors[index] = floor
+                if (index >= 0) {
+                    floors[index] = floor
+                }
             }
 
             override fun removedFloor(floor: ProximiioFloor?) {
@@ -362,7 +364,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                     it.id === floor.id
                 }
 
-                floors.removeAt(index)
+                if (index >= 0) {
+                    floors.removeAt(index)
+                }
             }
 
             override fun addedPlace(place: ProximiioPlace?) {
@@ -380,7 +384,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                     it.id === place.id
                 }
 
-                places[index] = place
+                if (index >= 0) {
+                    places[index] = place
+                }
             }
 
             override fun removedPlace(place: ProximiioPlace?) {
@@ -392,7 +398,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                     it.id === place.id
                 }
 
-                places.removeAt(index)
+                if (index >= 0) {
+                    places.removeAt(index)
+                }
             }
 
             override fun addedDepartment(department: ProximiioDepartment?) {
@@ -410,7 +418,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                     it.id === department.id
                 }
 
-                departments[index] = department
+                if (index >= 0) {
+                    departments[index] = department
+                }
             }
 
             override fun removedDepartment(department: ProximiioDepartment?) {
@@ -422,7 +432,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                     it.id === department.id
                 }
 
-                departments.removeAt(index)
+                if (index >= 0) {
+                    departments[index] = department
+                }
             }
 
             override fun loginFailed(error: LoginError) {
