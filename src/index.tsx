@@ -195,6 +195,14 @@ export class Proximiio {
     }
   }
 
+  setPdr(enabled: boolean, pdrCorrectionThreshold: number) {
+    ProximiioNative.setPdr(enabled, pdrCorrectionThreshold);
+  }
+
+  setSnapToRoute(enabled: boolean, pdrCorrectionThreshold: number) {
+    ProximiioNative.setSnapToRoute(enabled, pdrCorrectionThreshold);
+  }
+
   updateOptions() {
     if (Platform.OS === 'android') {
       ProximiioNative.updateOptions();

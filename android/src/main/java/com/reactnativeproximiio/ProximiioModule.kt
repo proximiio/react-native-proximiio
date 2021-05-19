@@ -24,6 +24,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     private val floors: MutableList<ProximiioFloor> = CopyOnWriteArrayList()
     private val places: MutableList<ProximiioPlace> = CopyOnWriteArrayList()
     private var auth: String? = null
+    private var pdrEnabled = false
 
     @ReactMethod
     fun setNotificationMode(mode: Int) {
@@ -51,6 +52,19 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     @ReactMethod
     fun updateOptions() {
         proximiioAPI?.updateNotificationOptions(options)
+    }
+
+    @ReactMethod
+    fun setPdr(enable: Boolean, thresholdInMeters: Double) {
+      this.pdrEnabled = enable
+      proximiioAPI!!.pdrEnabled(enable)
+      proximiioAPI!!.pdrCorrectionThreshold(thresholdInMeters)
+    }
+
+    @ReactMethod
+    fun setSnapToRoute(enable: Boolean, thresholdInMeters: Double) {
+      proximiioAPI!!.snapToRouteEnabled(enable)
+      proximiioAPI!!.snapToRouteThreshold(thresholdInMeters)
     }
 
     @ReactMethod
@@ -466,9 +480,11 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 //         if (proximiioAPI != null) {
 //             trySetActivity()
 //         }
+        proximiioAPI?.pdrEnabled(pdrEnabled)
     }
 
     override fun onHostPause() {
+        proximiioAPI?.pdrEnabled(false)
         proximiioAPI?.setActivity(null)
         proximiioAPI?.onStop()
     }
@@ -531,7 +547,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             proximiioAPI!!.onRequestPermissionsResult(ProximiioAPI.PERMISSION_REQUEST, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), grantResults)
         }
     }
-  
+
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
         if (proximiioAPI != null) {
             proximiioAPI!!.onActivityResult(requestCode, resultCode, data)
