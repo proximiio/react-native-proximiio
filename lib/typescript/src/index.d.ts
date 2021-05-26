@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { NativeEventEmitter } from 'react-native';
 import { ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation } from './types';
 export declare enum BufferSize {
@@ -56,6 +56,7 @@ export declare class Proximiio {
     places(): Promise<ProximiioPlace[]>;
     setBufferSize(buffer: BufferSize): void;
     requestPermissions(): void;
+    onPermissionResult(granted: boolean): void;
     enable(): void;
     disable(): void;
     subscribe(event: string, fn: (data: any) => void): import("react-native").EmitterSubscription;
@@ -64,6 +65,8 @@ export declare class Proximiio {
     setNotificationTitle(title: string): void;
     setNotificationText(text: string): void;
     setNotificationIcon(icon: string): void;
+    setPdr(enabled: boolean, pdrCorrectionThreshold: number): void;
+    setSnapToRoute(enabled: boolean, pdrCorrectionThreshold: number): void;
     updateOptions(): void;
     setNativeAccuracy(accuracy: NativeAccuracy): void;
     destroy(erase: boolean): void;
@@ -72,6 +75,4 @@ declare const instance: Proximiio;
 export default instance;
 export { ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation, };
 export declare const ProximiioContext: React.Context<ProximiioContextType>;
-export declare const ProximiioContextProvider: ({ children, }: {
-    children?: React.ReactNode;
-}) => JSX.Element;
+export declare const ProximiioContextProvider: ({ children, }: PropsWithChildren<{}>) => JSX.Element;

@@ -134,6 +134,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                 ProximiioGeofence.EventType.BEACON -> {
                     "beacon"
                 }
+                ProximiioGeofence.EventType.STEP -> {
+                    "step"
+                }
                 ProximiioGeofence.EventType.TRILATERATED -> {
                     "trilaterated"
                 }
