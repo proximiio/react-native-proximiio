@@ -1,9 +1,14 @@
 #import "ProximiioNative.h"
 @import Proximiio;
+@import ProximiioProcessor;
 
 @implementation ProximiioNative  {
     bool hasListeners;
     Proximiio *instance;
+    ProximiioPDRProcessor *pdr;
+    ProximiioSnapProcessor *snap;
+    bool pdrEnabled;
+    bool snapEnabled;
 }
 
 - (void)startObserving {
@@ -242,6 +247,8 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
       authWithTokenwithResolver:(RCTPromiseResolveBlock)resolve
                        rejecter:(RCTPromiseRejectBlock)reject) {
     dispatch_sync(dispatch_get_main_queue(),^ {
+        pdrEnabled = NO;
+        snapEnabled = NO;
         instance = [Proximiio sharedInstance];
         instance.delegate = self;
         [instance authWithToken:token
@@ -354,11 +361,43 @@ RCT_EXPORT_METHOD(currentFloor:(RCTPromiseResolveBlock)resolve
 }
 
 RCT_EXPORT_METHOD(setPdr:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *)pdrCorrectionThreshold {
-    // TODO
+    if (enable) {
+        pdr.threshold = pdrCorrectionThreshold.doubleValue;
+        
+        if (pdrEnabled) {
+            return;
+        }
+     
+        [ProximiioLocationManager.sharedManager addProcessor:pdr avoidDuplicates:YES];
+        pdrEnabled = true;
+    } else {
+        if (!pdrEnabled) {
+            return;
+        }
+        
+        [ProximiioLocationManager.sharedManager removeProcessor:pdr];
+        pdrEnabled = false;
+    }
 })
 
 RCT_EXPORT_METHOD(setSnapToRoute:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *)pdrCorrectionThreshold {
-    // TODO
+    if (enable) {
+        snap.threshold = pdrCorrectionThreshold.doubleValue;
+        
+        if (snapEnabled) {
+            return;
+        }
+     
+        [ProximiioLocationManager.sharedManager addProcessor:snap avoidDuplicates:YES];
+        snapEnabled = true;
+    } else {
+        if (!snapEnabled) {
+            return;
+        }
+        
+        [ProximiioLocationManager.sharedManager removeProcessor:snap];
+        snapEnabled = false;
+    }
 })
 
 @end
