@@ -151,7 +151,7 @@ export class Proximiio {
 
   onPermissionResult(granted: boolean) {
     if (Platform.OS === 'android') {
-      ProximiioNative.onPermissionResult(granted ? 1 : 0)
+      ProximiioNative.onPermissionResult(granted ? 1 : 0);
     }
   }
 
