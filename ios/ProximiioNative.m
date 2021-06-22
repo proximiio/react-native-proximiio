@@ -235,6 +235,7 @@
     }
 }
 
+
 RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(authWithToken:(NSString *)token
@@ -351,6 +352,14 @@ RCT_EXPORT_METHOD(currentFloor:(RCTPromiseResolveBlock)resolve
       resolve(nil);
     }
 }
+
+RCT_EXPORT_METHOD(setPdr:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *)pdrCorrectionThreshold {
+    // TODO
+})
+
+RCT_EXPORT_METHOD(setSnapToRoute:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *)pdrCorrectionThreshold {
+    // TODO
+})
 
 @end
 
