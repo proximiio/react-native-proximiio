@@ -17,6 +17,6 @@ Pod::Spec.new do |s|
 
   s.dependency "React"
   s.dependency "Proximiio", '5.1.5'
-  s.dependency "ProximiioProcessor", '0.1.13'
+  s.dependency "ProximiioProcessor", '0.1.14'
 
 end
