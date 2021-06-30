@@ -47,6 +47,7 @@ export enum ProximiioEvents {
   FoundEddystoneBeacon = 'ProximiioFoundEddystoneBeacon',
   UpdatedEddystoneBeacon = 'ProximiioUpdatedEddystoneBeacon',
   LostEddystoneBeacon = 'ProximiioLostEddystoneBeacon',
+  ItemsChanged = 'ProximiioItemsChanged',
 }
 
 export class Proximiio {

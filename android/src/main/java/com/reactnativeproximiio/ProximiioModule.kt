@@ -285,6 +285,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         proximiioAPI?.onStop()
         proximiioAPI = ProximiioAPI(TAG, reactContext, options)
         proximiioAPI!!.setListener(object : ProximiioListener() {
+
+            private var itemsLoaded = false
+
             override fun positionExtended(lat: Double, lon: Double, accuracy: Double, type: ProximiioGeofence.EventType?) {
                 sendEvent(EVENT_POSITION_UPDATED, convertLocation(lat, lon, accuracy, type))
             }
@@ -355,6 +358,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             override fun addedFloor(floor: ProximiioFloor?) {
                 if (floor != null) {
                     floors.add(floor)
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -369,6 +373,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     floors[index] = floor
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -383,12 +388,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     floors.removeAt(index)
+                    triggerItemsChangedEvent()
                 }
             }
 
             override fun addedPlace(place: ProximiioPlace?) {
                 if (place != null) {
                     places.add(place)
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -403,6 +410,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     places[index] = place
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -417,12 +425,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     places.removeAt(index)
+                    triggerItemsChangedEvent()
                 }
             }
 
             override fun addedDepartment(department: ProximiioDepartment?) {
                 if (department != null) {
                     departments.add(department)
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -437,6 +447,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     departments[index] = department
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -451,7 +462,19 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     departments[index] = department
+                    triggerItemsChangedEvent()
                 }
+            }
+
+            override fun itemsLoaded() {
+              itemsLoaded = true
+              sendEvent(EVENT_ITEMS_CHANGED)
+            }
+
+            private fun triggerItemsChangedEvent() {
+              if (itemsLoaded) {
+                sendEvent(EVENT_ITEMS_CHANGED)
+              }
             }
 
             override fun loginFailed(error: LoginError) {
@@ -514,7 +537,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 //            return constants
 //        }
 
-    private fun sendEvent(event: String, data: Any) {
+    private fun sendEvent(event: String, data: Any? = null) {
         if (emitter == null) {
             emitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
         }
@@ -578,6 +601,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         private const val EVENT_LOST_IBEACON = "ProximiioLostIBeacon"
         private const val EVENT_FOUND_EDDYSTONE = "ProximiioFoundEddystoneBeacon"
         private const val EVENT_LOST_EDDYSTONE = "ProximiioLostEddystoneBeacon"
+        private const val EVENT_ITEMS_CHANGED = "ProximiioItemsChanged"
     }
 
     init {
