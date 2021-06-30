@@ -12,8 +12,10 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.facebook.react.modules.core.PermissionListener
 import io.proximi.proximiiolibrary.*
+import kotlin.math.acos
 
 class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener, PermissionListener {
+    private val permissionHelper = PermissionHelper()
     private val options: ProximiioOptions
     private var proximiioAPI: ProximiioAPI? = null
     private var emitter: DeviceEventManagerModule.RCTDeviceEventEmitter? = null
@@ -74,6 +76,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     @ReactMethod
     fun requestPermissions() {
+      permissionHelper.checkAndRequest(currentActivity!!, this,true)
     }
 
     @ReactMethod
@@ -486,7 +489,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             }
         })
         proximiioAPI!!.setAuth(auth!!, true)
-        trySetActivity()
+//        proximiioAPI!!.setActivity(currentActivity!!)
+        permissionHelper.checkAndRequest(currentActivity!!, this)
+//        trySetActivity()
     }
 
     @ReactMethod
@@ -503,10 +508,10 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     }
 
     override fun onHostResume() {
-//         if (proximiioAPI != null) {
-//             trySetActivity()
-//         }
-        proximiioAPI?.pdrEnabled(pdrEnabled)
+        proximiioAPI?.let {
+          it.pdrEnabled(pdrEnabled)
+          permissionHelper.checkAndRequest(currentActivity!!, this)
+        }
     }
 
     override fun onHostPause() {
@@ -519,12 +524,10 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         proximiioAPI?.destroy()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray): Boolean {
-        if (proximiioAPI != null) {
-            proximiioAPI!!.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-
-        return true;
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
+        proximiioAPI?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionHelper.onPermissionResult(currentActivity!!, permissions, grantResults)
+        return true
     }
 
 
@@ -575,11 +578,8 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     }
 
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
-        if (proximiioAPI != null) {
-            proximiioAPI!!.onActivityResult(requestCode, resultCode, data)
-        }
+      proximiioAPI?.onActivityResult(requestCode, resultCode, data)
     }
-
 
     override fun onCatalystInstanceDestroy() {
         Log.d("ProximiioModule", "onCatalystInstanceDestroy")
@@ -608,6 +608,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         reactContext.addLifecycleEventListener(this)
         reactContext.addActivityEventListener(this)
         options = ProximiioOptions()
+        permissionHelper.onCreate()
     }
 
     override fun getName(): String {
