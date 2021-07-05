@@ -84,7 +84,7 @@ allprojects {
             url "http://proximi-io.bintray.com/proximiio-android"
         }
         maven {
-            url "http://indooratlas-ltd.bintray.com/mvn-public"
+            url “https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/”
         }
         maven {
             url 'https://maven.google.com'
