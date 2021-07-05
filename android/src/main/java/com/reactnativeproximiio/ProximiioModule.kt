@@ -84,7 +84,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         if (lastFloor == null) {
             promise.resolve(null)
         } else {
-            promise.resolve(convertFloor(lastFloor))
+            promise.resolve(convertFloor(lastFloor)!!)
         }
     }
 
@@ -110,7 +110,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     fun getFloors(promise: Promise) {
         val converted: WritableArray = Arguments.createArray()
         this.floors.forEach {
-            converted.pushMap(this.convertFloor(it))
+            converted.pushMap(this.convertFloor(it)!!)
         }
         promise.resolve(converted)
     }
@@ -217,9 +217,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         return map
     }
 
-    private fun convertFloor(floor: ProximiioFloor?): ReadableMap {
-        val map: WritableMap = Arguments.createMap()
-        if (floor != null) {
+    private fun convertFloor(floor: ProximiioFloor?): ReadableMap? {
+        return if (floor != null) {
+            val map: WritableMap = Arguments.createMap()
             map.putString("id", floor.id)
             map.putString("name", floor.name)
             if (floor.floorNumber != null) {
@@ -245,8 +245,10 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             } else {
                 map.putArray("anchors", Arguments.createArray())
             }
+          map
+        } else {
+          null
         }
-        return map
     }
 
     private fun convertPlace(place: ProximiioPlace?): ReadableMap {

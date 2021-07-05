@@ -83,9 +83,9 @@ export class Proximiio {
       }
     );
 
-    this.subscribe(ProximiioEvents.FloorChanged, (floor: ProximiioFloor) => {
+    this.subscribe(ProximiioEvents.FloorChanged, (floor?: ProximiioFloor) => {
       this.floor = floor;
-      this.level = floor.level;
+      this.level = floor?.level || 0;
     });
     return state;
   }
