@@ -64,10 +64,10 @@ repositories {
     url "https://maven.proximi.io/repository/android-releases/"
   }
   maven {
-    url “https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/”
+    url "https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/"
   }
   maven {
-      url 'https://maven.google.com'
+    url 'https://maven.google.com'
   }
 
   def found = false
