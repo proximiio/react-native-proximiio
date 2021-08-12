@@ -1,6 +1,6 @@
 {
   "name": "react-native-proximiio",
-  "version": "5.0.21",
+  "version": "5.0.22",
   "description": "Proximiio.SDK Library",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
