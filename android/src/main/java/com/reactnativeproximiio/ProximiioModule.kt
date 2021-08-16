@@ -178,7 +178,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         map.putMap("area", convertLocation(area.lat, area.lon, area.radius, null))
         map.putDouble("radius", area.radius)
         map.putBoolean("isPolygon", area.polygon != null)
-        map.putBoolean("entered", area.entered != null)
+        map.putBoolean("entered", area.isEntered() != null)
         if (area.polygon != null) {
             val polygon: WritableArray = Arguments.createArray()
             for (i in area.polygon!!.indices) {
@@ -316,7 +316,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             override fun addedGeofence(geofence: ProximiioGeofence) {
                 if (!geofences.contains(geofence)) {
                     geofences.add(geofence)
-                    if (geofence.entered) {
+                    if (geofence.isEntered()) {
                         enteredGeofences.add(geofence)
                         sendEvent(EVENT_GEOFENCE_ENTER, convertArea(geofence))
                     }
@@ -326,7 +326,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             override fun removedGeofence(geofence: ProximiioGeofence) {
                 geofences.remove(geofence)
                 enteredGeofences.remove(geofence)
-                if (geofence.entered) {
+                if (geofence.isEntered()) {
                     sendEvent(EVENT_GEOFENCE_EXIT, convertArea(geofence))
                 }
             }
