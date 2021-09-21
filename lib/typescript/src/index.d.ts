@@ -32,7 +32,8 @@ export declare enum ProximiioEvents {
     LostIBeacon = "ProximiioLostIBeacon",
     FoundEddystoneBeacon = "ProximiioFoundEddystoneBeacon",
     UpdatedEddystoneBeacon = "ProximiioUpdatedEddystoneBeacon",
-    LostEddystoneBeacon = "ProximiioLostEddystoneBeacon"
+    LostEddystoneBeacon = "ProximiioLostEddystoneBeacon",
+    ItemsChanged = "ProximiioItemsChanged"
 }
 export declare class Proximiio {
     emitter: NativeEventEmitter;

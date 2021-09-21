@@ -12,14 +12,17 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.facebook.react.modules.core.PermissionListener
 import io.proximi.proximiiolibrary.*
+import kotlin.math.acos
 
 class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener, PermissionListener {
+    private val permissionHelper = PermissionHelper()
     private val options: ProximiioOptions
     private var proximiioAPI: ProximiioAPI? = null
     private var emitter: DeviceEventManagerModule.RCTDeviceEventEmitter? = null
     private var authPromise: Promise? = null
     private var lastFloor: ProximiioFloor? = null
     private val geofences: MutableList<ProximiioGeofence> = CopyOnWriteArrayList()
+    private val enteredGeofences: MutableList<ProximiioGeofence> = CopyOnWriteArrayList()
     private val departments: MutableList<ProximiioDepartment> = CopyOnWriteArrayList()
     private val floors: MutableList<ProximiioFloor> = CopyOnWriteArrayList()
     private val places: MutableList<ProximiioPlace> = CopyOnWriteArrayList()
@@ -74,6 +77,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     @ReactMethod
     fun requestPermissions() {
+      permissionHelper.checkAndRequest(currentActivity!!, this,true)
     }
 
     @ReactMethod
@@ -81,14 +85,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         if (lastFloor == null) {
             promise.resolve(null)
         } else {
-            promise.resolve(convertFloor(lastFloor))
+            promise.resolve(convertFloor(lastFloor)!!)
         }
     }
 
     @ReactMethod
     fun currentGeofences(promise: Promise) {
         val converted: WritableArray = Arguments.createArray()
-        for (geofence in geofences) {
+        for (geofence in enteredGeofences) {
             converted.pushMap(convertArea(geofence))
         }
         promise.resolve(converted)
@@ -104,10 +108,19 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     }
 
     @ReactMethod
+    fun getGeofences(promise: Promise) {
+        val converted: WritableArray = Arguments.createArray()
+        geofences.forEach {
+            converted.pushMap(this.convertArea(it))
+        }
+        promise.resolve(converted)
+    }
+
+    @ReactMethod
     fun getFloors(promise: Promise) {
         val converted: WritableArray = Arguments.createArray()
         this.floors.forEach {
-            converted.pushMap(this.convertFloor(it))
+            converted.pushMap(this.convertFloor(it)!!)
         }
         promise.resolve(converted)
     }
@@ -165,6 +178,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         map.putMap("area", convertLocation(area.lat, area.lon, area.radius, null))
         map.putDouble("radius", area.radius)
         map.putBoolean("isPolygon", area.polygon != null)
+        map.putBoolean("entered", area.isEntered() != null)
         if (area.polygon != null) {
             val polygon: WritableArray = Arguments.createArray()
             for (i in area.polygon!!.indices) {
@@ -214,9 +228,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         return map
     }
 
-    private fun convertFloor(floor: ProximiioFloor?): ReadableMap {
-        val map: WritableMap = Arguments.createMap()
-        if (floor != null) {
+    private fun convertFloor(floor: ProximiioFloor?): ReadableMap? {
+        return if (floor != null) {
+            val map: WritableMap = Arguments.createMap()
             map.putString("id", floor.id)
             map.putString("name", floor.name)
             if (floor.floorNumber != null) {
@@ -242,8 +256,10 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             } else {
                 map.putArray("anchors", Arguments.createArray())
             }
+          map
+        } else {
+          null
         }
-        return map
     }
 
     private fun convertPlace(place: ProximiioPlace?): ReadableMap {
@@ -285,6 +301,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         proximiioAPI?.onStop()
         proximiioAPI = ProximiioAPI(TAG, reactContext, options)
         proximiioAPI!!.setListener(object : ProximiioListener() {
+
+            private var itemsLoaded = false
+
             override fun positionExtended(lat: Double, lon: Double, accuracy: Double, type: ProximiioGeofence.EventType?) {
                 sendEvent(EVENT_POSITION_UPDATED, convertLocation(lat, lon, accuracy, type))
             }
@@ -294,9 +313,27 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                 sendEvent(EVENT_FLOOR_CHANGED, convertFloor(floor))
             }
 
-            override fun geofenceEnter(geofence: ProximiioGeofence) {
+            override fun addedGeofence(geofence: ProximiioGeofence) {
                 if (!geofences.contains(geofence)) {
                     geofences.add(geofence)
+                    if (geofence.isEntered()) {
+                        enteredGeofences.add(geofence)
+                        sendEvent(EVENT_GEOFENCE_ENTER, convertArea(geofence))
+                    }
+                }
+            }
+
+            override fun removedGeofence(geofence: ProximiioGeofence) {
+                geofences.remove(geofence)
+                enteredGeofences.remove(geofence)
+                if (geofence.isEntered()) {
+                    sendEvent(EVENT_GEOFENCE_EXIT, convertArea(geofence))
+                }
+            }
+
+            override fun geofenceEnter(geofence: ProximiioGeofence) {
+                if (!enteredGeofences.contains(geofence)) {
+                    enteredGeofences.add(geofence)
                 }
                 sendEvent(EVENT_GEOFENCE_ENTER, convertArea(geofence))
             }
@@ -308,8 +345,8 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                 } else {
                     map.putNull("dwellTime")
                 }
-                if (geofences.contains(geofence)) {
-                    geofences.remove(geofence)
+                if (enteredGeofences.contains(geofence)) {
+                    enteredGeofences.remove(geofence)
                 }
                 sendEvent(EVENT_GEOFENCE_EXIT, map)
             }
@@ -355,6 +392,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             override fun addedFloor(floor: ProximiioFloor?) {
                 if (floor != null) {
                     floors.add(floor)
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -369,6 +407,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     floors[index] = floor
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -383,12 +422,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     floors.removeAt(index)
+                    triggerItemsChangedEvent()
                 }
             }
 
             override fun addedPlace(place: ProximiioPlace?) {
                 if (place != null) {
                     places.add(place)
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -403,6 +444,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     places[index] = place
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -417,12 +459,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     places.removeAt(index)
+                    triggerItemsChangedEvent()
                 }
             }
 
             override fun addedDepartment(department: ProximiioDepartment?) {
                 if (department != null) {
                     departments.add(department)
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -437,6 +481,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     departments[index] = department
+                    triggerItemsChangedEvent()
                 }
             }
 
@@ -451,7 +496,19 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
                 if (index >= 0) {
                     departments[index] = department
+                    triggerItemsChangedEvent()
                 }
+            }
+
+            override fun itemsLoaded() {
+              itemsLoaded = true
+              sendEvent(EVENT_ITEMS_CHANGED)
+            }
+
+            private fun triggerItemsChangedEvent() {
+              if (itemsLoaded) {
+                sendEvent(EVENT_ITEMS_CHANGED)
+              }
             }
 
             override fun loginFailed(error: LoginError) {
@@ -463,7 +520,9 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             }
         })
         proximiioAPI!!.setAuth(auth!!, true)
-        trySetActivity()
+//        proximiioAPI!!.setActivity(currentActivity!!)
+        permissionHelper.checkAndRequest(currentActivity!!, this)
+//        trySetActivity()
     }
 
     @ReactMethod
@@ -480,10 +539,10 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     }
 
     override fun onHostResume() {
-//         if (proximiioAPI != null) {
-//             trySetActivity()
-//         }
-        proximiioAPI?.pdrEnabled(pdrEnabled)
+        proximiioAPI?.let {
+          it.pdrEnabled(pdrEnabled)
+          permissionHelper.checkAndRequest(currentActivity!!, this)
+        }
     }
 
     override fun onHostPause() {
@@ -496,12 +555,10 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         proximiioAPI?.destroy()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray): Boolean {
-        if (proximiioAPI != null) {
-            proximiioAPI!!.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-
-        return true;
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
+        proximiioAPI?.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionHelper.onPermissionResult(currentActivity!!, permissions, grantResults)
+        return true
     }
 
 
@@ -514,7 +571,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 //            return constants
 //        }
 
-    private fun sendEvent(event: String, data: Any) {
+    private fun sendEvent(event: String, data: Any? = null) {
         if (emitter == null) {
             emitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
         }
@@ -552,11 +609,8 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     }
 
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
-        if (proximiioAPI != null) {
-            proximiioAPI!!.onActivityResult(requestCode, resultCode, data)
-        }
+      proximiioAPI?.onActivityResult(requestCode, resultCode, data)
     }
-
 
     override fun onCatalystInstanceDestroy() {
         Log.d("ProximiioModule", "onCatalystInstanceDestroy")
@@ -578,12 +632,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         private const val EVENT_LOST_IBEACON = "ProximiioLostIBeacon"
         private const val EVENT_FOUND_EDDYSTONE = "ProximiioFoundEddystoneBeacon"
         private const val EVENT_LOST_EDDYSTONE = "ProximiioLostEddystoneBeacon"
+        private const val EVENT_ITEMS_CHANGED = "ProximiioItemsChanged"
     }
 
     init {
         reactContext.addLifecycleEventListener(this)
         reactContext.addActivityEventListener(this)
         options = ProximiioOptions()
+        permissionHelper.onCreate()
     }
 
     override fun getName(): String {
