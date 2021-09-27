@@ -37,6 +37,7 @@ export enum ProximiioEvents {
   Initialized = 'ProximiioInitialized',
   PositionUpdated = 'ProximiioPositionUpdated',
   FloorChanged = 'ProximiioFloorChanged',
+  ItemsChanged = 'ProximiioItemsChanged',
   EnteredGeofence = 'ProximiioEnteredGeofence',
   ExitedGeofence = 'ProximiioExitedGeofence',
   EnteredPrivacyZone = 'ProximiioEnteredPrivacyZone',
@@ -47,7 +48,6 @@ export enum ProximiioEvents {
   FoundEddystoneBeacon = 'ProximiioFoundEddystoneBeacon',
   UpdatedEddystoneBeacon = 'ProximiioUpdatedEddystoneBeacon',
   LostEddystoneBeacon = 'ProximiioLostEddystoneBeacon',
-  ItemsChanged = 'ProximiioItemsChanged',
 }
 
 export class Proximiio {
@@ -164,12 +164,20 @@ export class Proximiio {
     ProximiioNative.disable();
   }
 
-  subscribe(event: string, fn: (data: any) => void) {
-    return this.emitter.addListener(event, fn);
+  subscribe(event: string, fn: (data: any) => void): any {
+    if (event) {
+      return this.emitter.addListener(event, fn);
+    } else {
+      // console.warn(`ignored native emitter subscribe request, event: ${event}, fn: ${fn.toString()}`);
+    }
   }
 
-  unsubscribe(event: string, fn: (data: any) => void) {
-    return this.emitter.removeListener(event, fn);
+  unsubscribe(event: string, fn: (data: any) => void): any {
+    if (event) {
+      return this.emitter.removeListener(event, fn);
+    } else {
+      // console.warn(`ignored native emitter unsubscribe request, event: ${event}, fn: ${fn.toString()}`);
+    }
   }
 
   setNotificationMode(mode: NotificationMode) {
