@@ -21,6 +21,7 @@
 
 - (NSArray<NSString *> *)supportedEvents {
     return @[
+      @"null",
       @"ProximiioInitialized",
       @"ProximiioPositionUpdated",
       @"ProximiioHandleOutput",
@@ -31,6 +32,7 @@
       @"ProximiioFoundIBeacon",
       @"ProximiioUpdatedIBeacon",
       @"ProximiioLostIBeacon",
+      @"ProximiioItemsChanged",
       @"ProximiioFoundEddystoneBeacon",
       @"ProximiioUpdatedEddystoneBeacon",
       @"ProximiioLostEddystoneBeacon",
@@ -186,7 +188,7 @@
     if (floor != nil) {
       [body setValue:[self convertFloor:instance.currentFloor] forKey:@"floor"];
     }
-
+    
     [self _sendEventWithName:@"ProximiioPositionUpdated" body:[self convertLocation:location]];
 }
 
@@ -250,16 +252,28 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
         pdrEnabled = NO;
         snapEnabled = NO;
         instance = [Proximiio sharedInstance];
-        instance.delegate = self;
+        pdr = [[ProximiioPDRProcessor alloc] init];
+        snap = [[ProximiioSnapProcessor alloc] init];
         [instance authWithToken:token
                        callback:^(ProximiioState result) {
                           if (result == kProximiioReady) {
-                              NSDictionary *state = @{
-                                @"visitorId": self->instance.visitorId,
-                                @"ready": @true
-                              };
-                              resolve(state);
-                              [self _sendEventWithName:@"ProximiioInitialized" body:state];
+                              [self->instance sync:^(BOOL completed) {
+                                  if (completed) {
+                                      
+                                      [self->instance enable];
+//                                      [self->instance startUpdating];
+                                      self->instance.delegate = self;
+                                      [self->instance setBufferSize:kProximiioBufferMini];
+                                      NSDictionary *state = @{
+                                        @"visitorId": self->instance.visitorId,
+                                        @"ready": @true
+                                      };
+                                      resolve(state);
+                                      [self _sendEventWithName:@"ProximiioInitialized" body:state];
+                                  } else {
+                                      reject(@"403", @"Proximi.io authorization synchronization failed", nil);
+                                  }
+                              }];
                           } else {
                               NSError *error = [[NSError alloc] initWithDomain:NSURLErrorDomain code:403 userInfo:nil];
                               reject(@"403", @"Proximi.io authorization failed", error);
@@ -365,6 +379,7 @@ RCT_EXPORT_METHOD(setPdr:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *
         pdr.threshold = pdrCorrectionThreshold.doubleValue;
         
         if (pdrEnabled) {
+            NSLog(@"PDR is already enabled, returning");
             return;
         }
      
