@@ -23,6 +23,7 @@ export declare enum ProximiioEvents {
     Initialized = "ProximiioInitialized",
     PositionUpdated = "ProximiioPositionUpdated",
     FloorChanged = "ProximiioFloorChanged",
+    ItemsChanged = "ProximiioItemsChanged",
     EnteredGeofence = "ProximiioEnteredGeofence",
     ExitedGeofence = "ProximiioExitedGeofence",
     EnteredPrivacyZone = "ProximiioEnteredPrivacyZone",
@@ -32,8 +33,7 @@ export declare enum ProximiioEvents {
     LostIBeacon = "ProximiioLostIBeacon",
     FoundEddystoneBeacon = "ProximiioFoundEddystoneBeacon",
     UpdatedEddystoneBeacon = "ProximiioUpdatedEddystoneBeacon",
-    LostEddystoneBeacon = "ProximiioLostEddystoneBeacon",
-    ItemsChanged = "ProximiioItemsChanged"
+    LostEddystoneBeacon = "ProximiioLostEddystoneBeacon"
 }
 export declare class Proximiio {
     emitter: NativeEventEmitter;
@@ -60,8 +60,8 @@ export declare class Proximiio {
     onPermissionResult(granted: boolean): void;
     enable(): void;
     disable(): void;
-    subscribe(event: string, fn: (data: any) => void): import("react-native").EmitterSubscription;
-    unsubscribe(event: string, fn: (data: any) => void): void;
+    subscribe(event: string, fn: (data: any) => void): any;
+    unsubscribe(event: string, fn: (data: any) => void): any;
     setNotificationMode(mode: NotificationMode): void;
     setNotificationTitle(title: string): void;
     setNotificationText(text: string): void;
