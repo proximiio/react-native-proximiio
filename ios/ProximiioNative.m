@@ -42,13 +42,13 @@
 }
 
 - (NSDictionary *)convertLocation:(ProximiioLocation *)location {
-    
+
     NSMutableDictionary *data = @{
       @"lat": @(location.coordinate.latitude),
       @"lng": @(location.coordinate.longitude),
-      
+
     }.mutableCopy;
-    
+
     if (location.sourceType != nil) {
         data[@"sourceType"] = location.sourceType;
     }
@@ -183,13 +183,15 @@
 }
 
 - (void)proximiioPositionUpdated:(ProximiioLocation *)location {
-    NSMutableDictionary *body = [[self convertLocation:location] mutableCopy];
-    ProximiioFloor *floor = instance.currentFloor;
-    if (floor != nil) {
-      [body setValue:[self convertFloor:instance.currentFloor] forKey:@"floor"];
+    if (location != nil) {
+      NSMutableDictionary *body = [[self convertLocation:location] mutableCopy];
+      ProximiioFloor *floor = instance.currentFloor;
+      if (floor != nil) {
+        [body setValue:[self convertFloor:instance.currentFloor] forKey:@"floor"];
+      }
+
+      [self _sendEventWithName:@"ProximiioPositionUpdated" body:[self convertLocation:location]];
     }
-    
-    [self _sendEventWithName:@"ProximiioPositionUpdated" body:[self convertLocation:location]];
 }
 
 - (void)proximiioEnteredGeofence:(ProximiioGeofence *)geofence {
@@ -259,7 +261,7 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
                           if (result == kProximiioReady) {
                               [self->instance sync:^(BOOL completed) {
                                   if (completed) {
-                                      
+
                                       [self->instance enable];
 //                                      [self->instance startUpdating];
                                       self->instance.delegate = self;
@@ -377,19 +379,19 @@ RCT_EXPORT_METHOD(currentFloor:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(setPdr:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *)pdrCorrectionThreshold {
     if (enable) {
         pdr.threshold = pdrCorrectionThreshold.doubleValue;
-        
+
         if (pdrEnabled) {
             NSLog(@"PDR is already enabled, returning");
             return;
         }
-     
+
         [ProximiioLocationManager.sharedManager addProcessor:pdr avoidDuplicates:YES];
         pdrEnabled = true;
     } else {
         if (!pdrEnabled) {
             return;
         }
-        
+
         [ProximiioLocationManager.sharedManager removeProcessor:pdr];
         pdrEnabled = false;
     }
@@ -398,18 +400,18 @@ RCT_EXPORT_METHOD(setPdr:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *
 RCT_EXPORT_METHOD(setSnapToRoute:(BOOL)enable pdrCorrectionThreshold:(nonnull NSNumber *)pdrCorrectionThreshold {
     if (enable) {
         snap.threshold = pdrCorrectionThreshold.doubleValue;
-        
+
         if (snapEnabled) {
             return;
         }
-     
+
         [ProximiioLocationManager.sharedManager addProcessor:snap avoidDuplicates:YES];
         snapEnabled = true;
     } else {
         if (!snapEnabled) {
             return;
         }
-        
+
         [ProximiioLocationManager.sharedManager removeProcessor:snap];
         snapEnabled = false;
     }
