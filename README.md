@@ -12,11 +12,11 @@ search: true
 
 # Introduction
 
-Welcome to the Proximi.io React Native Library, this library provides indoor positioning support for both IOS and Android platforms. 
+Welcome to the Proximi.io React Native Library, this library provides indoor positioning support for both IOS and Android platforms.
 
 # Version
 
-Current public version is: `5.2.1`
+Current public version is: `5.2.2`
 
 # Installation
 
@@ -216,7 +216,7 @@ export class UserLocationSource extends React.Component<Props, State> {
         Lat: { this.context.location.lat }
         Lng: { this.context.location.lng }
         Level: { this.context.level }
-      </Text>      
+      </Text>
     )
   }
 }
@@ -224,7 +224,7 @@ export class UserLocationSource extends React.Component<Props, State> {
 
 ### Functional component context consumer example
 ```ts
-export () => { 
+export () => {
   const context = useContext(ProximiioContext)
 
   return (
@@ -232,7 +232,7 @@ export () => {
       Lat: { context.location.lat }
       Lng: { context.location.lng }
       Level: { context.level }
-    </Text>      
+    </Text>
   )
 }
 ```
@@ -251,10 +251,10 @@ If your application is fine with "When in Use" permission only, call:
 Proximiio.requestPermissions(false);
 
 
-### Proximiio.enable(): void 
+### Proximiio.enable(): void
 enables Proximi.io positioning engine
 
-### Proximiio.disable(): void 
+### Proximiio.disable(): void
 disables Proximi.io positioning engine
 
 ### Proximiio.currentFloor(): Promise<ProximiioFloor>

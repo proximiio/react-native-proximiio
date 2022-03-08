@@ -1,5 +1,10 @@
 import React, { useEffect, useState, PropsWithChildren } from 'react';
-import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
+import {
+  NativeModules,
+  NativeEventEmitter,
+  Platform,
+  EmitterSubscription,
+} from 'react-native';
 const { ProximiioNative } = NativeModules;
 
 import {
@@ -164,15 +169,23 @@ export class Proximiio {
     ProximiioNative.disable();
   }
 
-  subscribe(event: string, fn: (data: any) => void): any {
+  subscribe(
+    event: string,
+    fn: (data: any) => void
+  ): EmitterSubscription | undefined {
     if (event) {
       return this.emitter.addListener(event, fn);
     } else {
+      return;
       // console.warn(`ignored native emitter subscribe request, event: ${event}, fn: ${fn.toString()}`);
     }
   }
 
   unsubscribe(event: string, fn: (data: any) => void): any {
+    console.warn(
+      'Unsubscribe method is being deprecated, please use remove() on the subscription'
+    );
+
     if (event) {
       return this.emitter.removeListener(event, fn);
     } else {
@@ -256,12 +269,18 @@ export const ProximiioContextProvider = ({
       setContext(instance.getContext());
     };
 
-    instance.subscribe(ProximiioEvents.PositionUpdated, contextSetter);
-    instance.subscribe(ProximiioEvents.FloorChanged, contextSetter);
+    const positionSub = instance.subscribe(
+      ProximiioEvents.PositionUpdated,
+      contextSetter
+    );
+    const floorsSub = instance.subscribe(
+      ProximiioEvents.FloorChanged,
+      contextSetter
+    );
 
     return () => {
-      instance.unsubscribe(ProximiioEvents.PositionUpdated, contextSetter);
-      instance.unsubscribe(ProximiioEvents.FloorChanged, contextSetter);
+      positionSub?.remove();
+      floorsSub?.remove();
     };
   }, []);
 
