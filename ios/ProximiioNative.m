@@ -261,9 +261,8 @@ RCT_EXPORT_METHOD(authWithToken:(NSString *)token
                           if (result == kProximiioReady) {
                               [self->instance sync:^(BOOL completed) {
                                   if (completed) {
-
                                       [self->instance enable];
-//                                      [self->instance startUpdating];
+                                      [self->instance startUpdating];
                                       self->instance.delegate = self;
                                       [self->instance setBufferSize:kProximiioBufferMini];
                                       NSDictionary *state = @{
