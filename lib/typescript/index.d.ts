@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { NativeEventEmitter } from 'react-native';
+import { NativeEventEmitter, EmitterSubscription } from 'react-native';
 import { ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation } from './types';
 export declare enum BufferSize {
     MINI = 0,
@@ -60,7 +60,7 @@ export declare class Proximiio {
     onPermissionResult(granted: boolean): void;
     enable(): void;
     disable(): void;
-    subscribe(event: string, fn: (data: any) => void): any;
+    subscribe(event: string, fn: (data: any) => void): EmitterSubscription | undefined;
     unsubscribe(event: string, fn: (data: any) => void): any;
     setNotificationMode(mode: NotificationMode): void;
     setNotificationTitle(title: string): void;
