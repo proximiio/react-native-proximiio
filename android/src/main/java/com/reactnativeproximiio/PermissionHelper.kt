@@ -2,16 +2,12 @@ package com.reactnativeproximiio
 
 import android.Manifest
 import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import io.proximi.proximiiolibrary.ProximiioAPI
-
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.facebook.react.modules.core.PermissionListener
 import io.proximi.proximiiolibrary.ProximiioAPI.BLUETOOTH_REQUEST
