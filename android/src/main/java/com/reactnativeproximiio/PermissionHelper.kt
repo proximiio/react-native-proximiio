@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import io.proximi.proximiiolibrary.ProximiioAPI
 import com.facebook.react.modules.core.PermissionAwareActivity
@@ -18,9 +19,13 @@ private const val TAG = "PermissionHelper"
 class PermissionHelper {
 
   private var alreadyChecked = false
+  private var bluetoothChecked = false
+
+  constructor()
 
   fun onCreate() {
     alreadyChecked = false
+    bluetoothChecked = false
   }
 
   fun checkAndRequest(activity: Activity, permissionListener: PermissionListener, force: Boolean = false) {
@@ -76,6 +81,7 @@ class PermissionHelper {
       }
 
       if (!isBluetoothEnabled()) {
+        bluetoothChecked = true
         ActivityCompat.startActivityForResult(
           mainActivity,
           Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
@@ -85,6 +91,7 @@ class PermissionHelper {
       }
     } else {
       if (!isBluetoothEnabled()) {
+        bluetoothChecked = true
         ActivityCompat.startActivityForResult(
           mainActivity,
           Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
