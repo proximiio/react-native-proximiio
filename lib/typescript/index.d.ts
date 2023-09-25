@@ -56,7 +56,9 @@ export declare class Proximiio {
     getPlace(id: string): Promise<ProximiioPlace | null>;
     places(): Promise<ProximiioPlace[]>;
     setBufferSize(buffer: BufferSize): void;
-    requestPermissions(): void;
+    requestPermissions(useBluetooth?: boolean): void;
+    checkAndRequestBluetooth(): Promise<void>;
+    isBluetoothEnabled(): Promise<boolean>;
     onPermissionResult(granted: boolean): void;
     enable(): void;
     disable(): void;

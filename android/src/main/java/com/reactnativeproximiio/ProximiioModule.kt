@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.util.Log
 import com.facebook.react.bridge.*
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -12,7 +11,6 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.facebook.react.modules.core.PermissionListener
 import io.proximi.proximiiolibrary.*
-import kotlin.math.acos
 
 class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener, PermissionListener {
     private val permissionHelper = PermissionHelper()
@@ -28,6 +26,8 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     private val places: MutableList<ProximiioPlace> = CopyOnWriteArrayList()
     private var auth: String? = null
     private var pdrEnabled = false
+    private var useBluetooth = true
+    private var bluetoothDenied = false
 
     @ReactMethod
     fun setNotificationMode(mode: Int) {
@@ -76,8 +76,21 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     }
 
     @ReactMethod
-    fun requestPermissions() {
-      permissionHelper.checkAndRequest(currentActivity!!, this,true)
+    fun requestPermissions(alwaysPermission: Boolean = true, useBluetooth: Boolean = true) {
+        this.useBluetooth = useBluetooth
+        permissionHelper.checkAndRequest(currentActivity!!, this,true, useBluetooth)
+    }
+
+    @ReactMethod
+    fun checkAndRequestBluetooth(promise: Promise) {
+        bluetoothDenied = false
+        useBluetooth = true
+        permissionHelper.checkAndRequestBluetooth(currentActivity!!)
+    }
+
+    @ReactMethod
+    fun isBluetoothEnabled(promise: Promise) {
+        promise.resolve(permissionHelper.isBluetoothEnabled())
     }
 
     @ReactMethod
@@ -520,9 +533,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             }
         })
         proximiioAPI!!.setAuth(auth!!, true)
-//        proximiioAPI!!.setActivity(currentActivity!!)
-        permissionHelper.checkAndRequest(currentActivity!!, this)
-//        trySetActivity()
+//        permissionHelper.checkAndRequest(currentActivity!!, this)
     }
 
     @ReactMethod
@@ -538,10 +549,21 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         proximiioAPI = null
     }
 
+    private fun shouldBluetooth(): Boolean {
+        if (bluetoothDenied) {
+            return false
+        }
+
+        return useBluetooth
+    }
+
     override fun onHostResume() {
         proximiioAPI?.let {
           it.pdrEnabled(pdrEnabled)
-          permissionHelper.checkAndRequest(currentActivity!!, this)
+          permissionHelper.checkAndRequest(currentActivity!!, this,
+              force = false,
+              useBluetooth = shouldBluetooth()
+          )
         }
     }
 
@@ -609,11 +631,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     }
 
     override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
-      proximiioAPI?.onActivityResult(requestCode, resultCode, data)
+        if (!(requestCode == 114 && resultCode == 0)) {
+            proximiioAPI?.onActivityResult(requestCode, resultCode, data)
+        } else {
+            bluetoothDenied = true
+        }
     }
 
     override fun onCatalystInstanceDestroy() {
-        Log.d("ProximiioModule", "onCatalystInstanceDestroy")
         super.onCatalystInstanceDestroy()
     }
 

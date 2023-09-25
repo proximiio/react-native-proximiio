@@ -19,17 +19,13 @@ private const val TAG = "PermissionHelper"
 class PermissionHelper {
 
   private var alreadyChecked = false
-  private var bluetoothChecked = false
-
-  constructor()
 
   fun onCreate() {
     alreadyChecked = false
-    bluetoothChecked = false
   }
 
-  fun checkAndRequest(activity: Activity, permissionListener: PermissionListener, force: Boolean = false) {
-    if (hasLocationPermission(activity)) {
+  fun checkAndRequest(activity: Activity, permissionListener: PermissionListener, force: Boolean = false, useBluetooth: Boolean = true) {
+    if (hasLocationPermission(activity) && useBluetooth) {
       if (isBluetoothEnabled()) {
         return
       } else {
@@ -39,30 +35,36 @@ class PermissionHelper {
 
     if (!alreadyChecked || force) {
       alreadyChecked = true
-      checkAndRequestLocationPermission(activity, permissionListener)
+      checkAndRequestLocationPermission(activity, permissionListener, useBluetooth)
     }
   }
 
   fun onPermissionResult(activity: Activity, permissions: Array<out String>, grantResults: IntArray) {
     val locationPermissionIndex = permissions.indexOfFirst { it == Manifest.permission.ACCESS_FINE_LOCATION }
     if (locationPermissionIndex == -1) return
-    if (grantResults[locationPermissionIndex] == PackageManager.PERMISSION_GRANTED) {
-      checkAndRequestBluetooth(activity)
-    }
+//    if (grantResults[locationPermissionIndex] == PackageManager.PERMISSION_GRANTED) {
+//      //      checkAndRequestBluetooth(activity)
+//    }
   }
 
-  private fun checkAndRequestLocationPermission(activity: Activity, permissionListener: PermissionListener) {
+  private fun checkAndRequestLocationPermission(activity: Activity, permissionListener: PermissionListener, useBluetooth: Boolean = true) {
+    Log.d("PermissionHelper", "checkAndRequestLocationPermission: $useBluetooth")
     if (!hasLocationPermission(activity)) {
       (activity as PermissionAwareActivity).requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), ProximiioAPI.PERMISSION_REQUEST, permissionListener);
     } else {
-      checkAndRequestBluetooth(activity)
+      if (useBluetooth) {
+        Log.d("PermissionHelper", "bluetooth requested, checking and requesting")
+        Log.d("PermissionHelper", "checkAndRequestBluetooth call3")
+        checkAndRequestBluetooth(activity)
+      }
     }
   }
 
   /**
    * Check if bluetooth is enabled and request to enable it if not.
    */
-  private fun checkAndRequestBluetooth(mainActivity: Activity) {
+  fun checkAndRequestBluetooth(mainActivity: Activity) {
+    Log.d("PermissionHelper", "checkAndRequestBluetooth called")
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
       if (ActivityCompat.checkSelfPermission(
           mainActivity,
@@ -81,7 +83,6 @@ class PermissionHelper {
       }
 
       if (!isBluetoothEnabled()) {
-        bluetoothChecked = true
         ActivityCompat.startActivityForResult(
           mainActivity,
           Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
@@ -91,7 +92,6 @@ class PermissionHelper {
       }
     } else {
       if (!isBluetoothEnabled()) {
-        bluetoothChecked = true
         ActivityCompat.startActivityForResult(
           mainActivity,
           Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
@@ -107,7 +107,7 @@ class PermissionHelper {
     return ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
   }
 
-  private fun isBluetoothEnabled(): Boolean {
+  fun isBluetoothEnabled(): Boolean {
     return BluetoothAdapter.getDefaultAdapter()?.isEnabled == true
   }
 }

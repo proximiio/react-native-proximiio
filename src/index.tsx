@@ -149,10 +149,16 @@ export class Proximiio {
     }
   }
 
-  requestPermissions() {
-    if (Platform.OS === 'ios') {
-      ProximiioNative.requestPermissions(false);
-    }
+  requestPermissions(useBluetooth: boolean = true) {
+    ProximiioNative.requestPermissions(false, useBluetooth);
+  }
+
+  checkAndRequestBluetooth(): Promise<void> {
+    return ProximiioNative.checkAndRequestBluetooth()
+  }
+
+  isBluetoothEnabled(): Promise<boolean> {
+    return ProximiioNative.isBluetoothEnabled()
   }
 
   onPermissionResult(granted: boolean) {
