@@ -154,11 +154,11 @@ export class Proximiio {
   }
 
   checkAndRequestBluetooth(): Promise<void> {
-    return ProximiioNative.checkAndRequestBluetooth()
+    return ProximiioNative.checkAndRequestBluetooth();
   }
 
   isBluetoothEnabled(): Promise<boolean> {
-    return ProximiioNative.isBluetoothEnabled()
+    return ProximiioNative.isBluetoothEnabled();
   }
 
   onPermissionResult(granted: boolean) {
