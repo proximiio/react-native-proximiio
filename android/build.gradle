@@ -142,5 +142,5 @@ dependencies {
   // noinspection GradleDynamicVersion
   api 'com.facebook.react:react-native:+'
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-  implementation("io.proximi.library:core:5.1.12")
+  implementation("io.proximi.library:core:5.1.14")
 }
