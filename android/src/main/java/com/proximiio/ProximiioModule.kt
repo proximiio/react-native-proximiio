@@ -1,4 +1,4 @@
-package com.reactnativeproximiio
+package com.proximiio
 
 import android.Manifest
 import android.app.Activity
@@ -7,12 +7,18 @@ import android.content.pm.PackageManager
 import com.facebook.react.bridge.*
 import java.util.concurrent.CopyOnWriteArrayList
 
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.Promise
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.facebook.react.modules.core.PermissionListener
+import com.reactnativeproximiio.PermissionHelper
 import io.proximi.proximiiolibrary.*
 
-class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener, PermissionListener {
+class RNProximiioReactModule internal constructor(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), LifecycleEventListener, ActivityEventListener,
+  PermissionListener {
     private val permissionHelper = PermissionHelper()
     private val options: ProximiioOptions
     private var proximiioAPI: ProximiioAPI? = null
@@ -636,10 +642,6 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         } else {
             bluetoothDenied = true
         }
-    }
-
-    override fun onCatalystInstanceDestroy() {
-        super.onCatalystInstanceDestroy()
     }
 
     override fun onNewIntent(intent: Intent?) {}

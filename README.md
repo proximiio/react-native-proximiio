@@ -16,7 +16,7 @@ Welcome to the Proximi.io React Native Library, this library provides indoor pos
 
 # Version
 
-Current public version is: `5.2.14`
+Current public version is: `5.3.0`
 
 # Installation
 
@@ -36,7 +36,7 @@ platform :ios, '9.0'
 to
 
 ```
-platform :ios, '12.0'
+platform :ios, '13.0'
 ```
 
 After that run "pod install" command in the ios directory

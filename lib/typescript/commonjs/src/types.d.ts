@@ -1,10 +1,10 @@
-export declare type ProximiioInitState = {
+export type ProximiioInitState = {
     ready: boolean;
     visitorId: string;
     location?: ProximiioLocation;
 };
-export declare type FlatCoordinates = [number, number];
-export declare type ProximiioDepartment = {
+export type FlatCoordinates = [number, number];
+export type ProximiioDepartment = {
     id: string;
     name: string;
     floor_id: string;
@@ -12,7 +12,7 @@ export declare type ProximiioDepartment = {
     place_id: string;
     place: ProximiioPlace;
 };
-export declare type ProximiioFloor = {
+export type ProximiioFloor = {
     id: string;
     name: string;
     anchors: FlatCoordinates[];
@@ -20,25 +20,25 @@ export declare type ProximiioFloor = {
     place: ProximiioPlace;
     level: number;
 };
-export declare type ProximiioPlace = {
+export type ProximiioPlace = {
     id: string;
     name: string;
     address: string;
     location: ProximiioLocation;
 };
-export declare type ProximiioGeofence = {
+export type ProximiioGeofence = {
     id: string;
     name: string;
     isPolygon: boolean;
     location: ProximiioLocation;
 };
-export declare type ProximiioLocation = {
+export type ProximiioLocation = {
     lng: number;
     lat: number;
     sourceType?: string;
     accuracy?: number;
 };
-export declare type ProximiioInput = {
+export type ProximiioInput = {
     id: string;
     name: string;
     type: 'iBeacon' | 'eddystone' | 'custom';
@@ -58,3 +58,4 @@ export interface ProximiioContextType {
     floor?: ProximiioFloor;
     level?: number;
 }
+//# sourceMappingURL=types.d.ts.map

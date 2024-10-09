@@ -1,6 +1,5 @@
-import React, { PropsWithChildren } from 'react';
-import { NativeEventEmitter, EmitterSubscription } from 'react-native';
-import { ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation } from './types';
+import React, { type PropsWithChildren } from 'react';
+import { NativeEventEmitter, type EmitterSubscription } from 'react-native';
 export declare enum BufferSize {
     MINI = 0,
     SMALL = 1,
@@ -63,7 +62,6 @@ export declare class Proximiio {
     enable(): void;
     disable(): void;
     subscribe(event: string, fn: (data: any) => void): EmitterSubscription | undefined;
-    unsubscribe(event: string, fn: (data: any) => void): any;
     setNotificationMode(mode: NotificationMode): void;
     setNotificationTitle(title: string): void;
     setNotificationText(text: string): void;
@@ -76,6 +74,66 @@ export declare class Proximiio {
 }
 declare const instance: Proximiio;
 export default instance;
-export { ProximiioContextType, ProximiioInitState, ProximiioFloor, ProximiioGeofence, ProximiioDepartment, ProximiioPlace, ProximiioLocation, };
+export type ProximiioInitState = {
+    ready: boolean;
+    visitorId: string;
+    location?: ProximiioLocation;
+};
+export type FlatCoordinates = [number, number];
+export type ProximiioDepartment = {
+    id: string;
+    name: string;
+    floor_id: string;
+    floor: ProximiioFloor;
+    place_id: string;
+    place: ProximiioPlace;
+};
+export type ProximiioFloor = {
+    id: string;
+    name: string;
+    anchors: FlatCoordinates[];
+    place_id: string;
+    place: ProximiioPlace;
+    level: number;
+};
+export type ProximiioPlace = {
+    id: string;
+    name: string;
+    address: string;
+    location: ProximiioLocation;
+};
+export type ProximiioGeofence = {
+    id: string;
+    name: string;
+    isPolygon: boolean;
+    location: ProximiioLocation;
+};
+export type ProximiioLocation = {
+    lng: number;
+    lat: number;
+    sourceType?: string;
+    accuracy?: number;
+};
+export type ProximiioInput = {
+    id: string;
+    name: string;
+    type: 'iBeacon' | 'eddystone' | 'custom';
+    department_id: string;
+    floor_id: string;
+    place_id: string;
+    triggersFloorChange: boolean;
+    triggersPlaceChange: boolean;
+    uuid?: string;
+    major?: number;
+    minor?: number;
+    namespaceId?: string;
+    instanceId?: string;
+};
+export interface ProximiioContextType {
+    location?: ProximiioLocation;
+    floor?: ProximiioFloor;
+    level?: number;
+}
 export declare const ProximiioContext: React.Context<ProximiioContextType>;
-export declare const ProximiioContextProvider: ({ children, }: PropsWithChildren<{}>) => JSX.Element;
+export declare const ProximiioContextProvider: ({ children, }: PropsWithChildren<{}>) => import("react/jsx-runtime").JSX.Element;
+//# sourceMappingURL=index.d.ts.map

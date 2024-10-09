@@ -313,7 +313,7 @@ RCT_EXPORT_METHOD(getDepartments:(RCTPromiseResolveBlock)resolve rejecter:(RCTPr
   });
 }
 
-RCT_EXPORT_METHOD(requestPermissions:(nonnull NSNumber *)always useBluetooth:(NSNumber *)useBluetooth) {
+RCT_EXPORT_METHOD(requestPermissions:(nonnull NSNumber *)always useBluetooth:(nonnull NSNumber *)useBluetooth) {
   dispatch_sync(dispatch_get_main_queue(),^ {
     [instance requestPermissions:always];
   });

@@ -1,21 +1,11 @@
-import React, { useEffect, useState, PropsWithChildren } from 'react';
+import React, { useEffect, useState, type PropsWithChildren } from 'react';
 import {
   NativeModules,
   NativeEventEmitter,
   Platform,
-  EmitterSubscription,
+  type EmitterSubscription,
 } from 'react-native';
 const { ProximiioNative } = NativeModules;
-
-import {
-  ProximiioContextType,
-  ProximiioInitState,
-  ProximiioFloor,
-  ProximiioGeofence,
-  ProximiioDepartment,
-  ProximiioPlace,
-  ProximiioLocation,
-} from './types';
 
 export enum BufferSize {
   MINI = 0,
@@ -70,7 +60,6 @@ export class Proximiio {
     this.authorize = this.authorize.bind(this);
     this.getContext = this.getContext.bind(this);
     this.subscribe = this.subscribe.bind(this);
-    this.unsubscribe = this.unsubscribe.bind(this);
   }
 
   isAuthorized() {
@@ -187,18 +176,6 @@ export class Proximiio {
     }
   }
 
-  unsubscribe(event: string, fn: (data: any) => void): any {
-    console.warn(
-      'Unsubscribe method is being deprecated, please use remove() on the subscription'
-    );
-
-    if (event) {
-      return this.emitter.removeListener(event, fn);
-    } else {
-      // console.warn(`ignored native emitter unsubscribe request, event: ${event}, fn: ${fn.toString()}`);
-    }
-  }
-
   setNotificationMode(mode: NotificationMode) {
     if (Platform.OS === 'android') {
       ProximiioNative.setNotificationMode(mode);
@@ -253,15 +230,76 @@ export class Proximiio {
 const instance = new Proximiio();
 export default instance;
 
-export {
-  ProximiioContextType,
-  ProximiioInitState,
-  ProximiioFloor,
-  ProximiioGeofence,
-  ProximiioDepartment,
-  ProximiioPlace,
-  ProximiioLocation,
+export type ProximiioInitState = {
+  ready: boolean;
+  visitorId: string;
+  location?: ProximiioLocation;
 };
+
+export type FlatCoordinates = [number, number];
+
+export type ProximiioDepartment = {
+  id: string;
+  name: string;
+  floor_id: string;
+  floor: ProximiioFloor;
+  place_id: string;
+  place: ProximiioPlace;
+};
+
+export type ProximiioFloor = {
+  id: string;
+  name: string;
+  anchors: FlatCoordinates[];
+  place_id: string;
+  place: ProximiioPlace;
+  level: number;
+};
+
+export type ProximiioPlace = {
+  id: string;
+  name: string;
+  address: string;
+  location: ProximiioLocation;
+};
+
+export type ProximiioGeofence = {
+  id: string;
+  name: string;
+  isPolygon: boolean;
+  location: ProximiioLocation;
+};
+
+export type ProximiioLocation = {
+  lng: number;
+  lat: number;
+  sourceType?: string;
+  accuracy?: number;
+};
+
+export type ProximiioInput = {
+  id: string;
+  name: string;
+  type: 'iBeacon' | 'eddystone' | 'custom';
+  department_id: string;
+  floor_id: string;
+  place_id: string;
+  triggersFloorChange: boolean;
+  triggersPlaceChange: boolean;
+  // iBeacon specific
+  uuid?: string;
+  major?: number;
+  minor?: number;
+  // Eddystone specific
+  namespaceId?: string;
+  instanceId?: string;
+};
+
+export interface ProximiioContextType {
+  location?: ProximiioLocation;
+  floor?: ProximiioFloor;
+  level?: number;
+}
 
 export const ProximiioContext = React.createContext(instance.getContext());
 

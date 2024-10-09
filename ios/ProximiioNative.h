@@ -1,6 +1,7 @@
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
-#import <Proximiio/Proximiio.h>
+#import "ProximiioNative.h"
+@import Proximiio;
 
 @interface ProximiioNative : RCTEventEmitter <RCTBridgeModule, ProximiioDelegate>
 
