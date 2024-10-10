@@ -647,7 +647,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     override fun onNewIntent(intent: Intent?) {}
 
     @ReactMethod
-    fun addListener(eventName String?) {
+    fun addListener(eventName: String?) {
      // Keep: Required for RN built in Event Emitter Calls.
     }
 
