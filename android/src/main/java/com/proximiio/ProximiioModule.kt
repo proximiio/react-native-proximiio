@@ -646,6 +646,16 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     override fun onNewIntent(intent: Intent?) {}
 
+    @ReactMethod
+    fun addListener(eventName String?) {
+     // Keep: Required for RN built in Event Emitter Calls.
+    }
+
+    @ReactMethod
+    fun removeListeners(count: Int?) {
+     // Keep: Required for RN built in Event Emitter Calls.
+    }
+
     companion object {
         private const val TAG = "ProximiioReact"
         private const val EVENT_INITIALIZED = "ProximiioInitialized"

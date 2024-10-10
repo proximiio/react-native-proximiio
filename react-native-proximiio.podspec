@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m}"
 
-  s.dependency "CrystDB"
+  s.dependency "CrystDBCipher"
   s.dependency "Proximiio"
   s.dependency "ProximiioProcessor"
 
