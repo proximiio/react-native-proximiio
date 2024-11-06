@@ -96,7 +96,7 @@ allprojects {
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation("io.proximi.library:core:5.1.15")
+    implementation("io.proximi.library:core:5.1.16")
   }
 }
 

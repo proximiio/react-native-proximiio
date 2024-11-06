@@ -1,6 +1,6 @@
 {
   "name": "react-native-proximiio",
-  "version": "5.3.0",
+  "version": "5.3.1",
   "description": "Proximi.io SDK for React Native",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
