@@ -81,6 +81,15 @@ export class Proximiio {
       this.floor = floor;
       this.level = floor?.level || 0;
     });
+
+    await new Promise((resolve) => {
+      setTimeout(async () => {
+        this.disable();
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        this.enable();
+        resolve(true);
+      }, 2500);
+    });
     return state;
   }
 
