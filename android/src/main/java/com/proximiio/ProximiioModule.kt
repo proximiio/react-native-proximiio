@@ -66,14 +66,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     @ReactMethod
     fun setPdr(enable: Boolean, thresholdInMeters: Double) {
       this.pdrEnabled = enable
-      proximiioAPI!!.pdrEnabled(enable)
-      proximiioAPI!!.pdrCorrectionThreshold(thresholdInMeters)
+      proximiioAPI?.pdrEnabled(enable)
+      proximiioAPI?.pdrCorrectionThreshold(thresholdInMeters)
     }
 
     @ReactMethod
     fun setSnapToRoute(enable: Boolean, thresholdInMeters: Double) {
-      proximiioAPI!!.snapToRouteEnabled(enable)
-      proximiioAPI!!.snapToRouteThreshold(thresholdInMeters)
+      proximiioAPI?.snapToRouteEnabled(enable)
+      proximiioAPI?.snapToRouteThreshold(thresholdInMeters)
     }
 
     @ReactMethod
@@ -318,6 +318,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         authPromise = promise
         proximiioAPI?.setActivity(null)
         proximiioAPI?.onStop()
+        proximiioAPI?.destroy()
         proximiioAPI = ProximiioAPI(TAG, reactContext, options)
         proximiioAPI!!.setListener(object : ProximiioListener() {
 
@@ -398,11 +399,13 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
             override fun loggedIn(online: Boolean, auth: String) {
                 if (authPromise != null && online) {
+                    val visitorId = proximiioAPI?.visitorID
                     val map: WritableMap = Arguments.createMap()
-                    map.putString("visitorId", proximiioAPI!!.visitorID)
+                    map.putString("visitorId", visitorId)
                     authPromise!!.resolve(map)
+                    authPromise = null
                     val initMap: WritableMap = Arguments.createMap()
-                    initMap.putString("visitorId", proximiioAPI!!.visitorID)
+                    initMap.putString("visitorId", visitorId)
                     initMap.putBoolean("ready", true)
                     sendEvent(EVENT_INITIALIZED, initMap)
                 }
@@ -536,6 +539,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
                 } else {
                     authPromise?.reject("404", "Proximi.io connection failed")
                 }
+                authPromise = null
             }
         })
         proximiioAPI!!.setAuth(auth!!, true)
@@ -565,6 +569,8 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     override fun onHostResume() {
         proximiioAPI?.let {
+          it.setActivity(currentActivity)
+          it.onStart()
           it.pdrEnabled(pdrEnabled)
           permissionHelper.checkAndRequest(currentActivity!!, this,
               force = false,
