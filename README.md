@@ -16,7 +16,17 @@ Welcome to the Proximi.io React Native Library, this library provides indoor pos
 
 # Version
 
-Current public version is: `5.3.3`
+Current public version is: `5.3.5`
+
+## Changelog
+
+### 5.3.5
+- Android: positioning is now properly restarted when the application returns to foreground, fixes crash (`ProximiioDatabase.saveInputID` NullPointerException) when using the SDK after the app was minimized and reopened
+- Android: repeated authorization no longer leaks the previous native SDK instance
+- Android: updated Proximi.io Android SDK to 5.4.4
+
+### 5.3.4
+- Android: updated Proximi.io Android SDK to 5.4.2
 
 # Installation
 
@@ -64,16 +74,14 @@ For IOS its also necessary to configure location permissions
 <string>Allow bluetooth for improved beacon operation</string>
 ```
 
-For android edit your appliction build.gradle file, minSdkVersion needs to be 19 or higher and new repositories need to be added for proper installation.
-Since Version 5.0.4, compileSdkVersion and targetSdkVersion need to be 29 at least.
+For Android edit your application build.gradle file, minSdkVersion needs to be 21 or higher and the Proximi.io Maven repository needs to be added for proper installation.
 ```
 ...
 buildscript {
     ext {
-        buildToolsVersion = "28.0.3"
-        minSdkVersion = 19
-        compileSdkVersion = 29
-        targetSdkVersion = 29
+        minSdkVersion = 21
+        compileSdkVersion = 34
+        targetSdkVersion = 34
     }
 ...
 
@@ -81,10 +89,10 @@ allprojects {
     repositories {
         ...
         maven {
-            url "http://proximi-io.bintray.com/proximiio-android"
+            url "https://maven.proximi.io/repository/android-releases/"
         }
         maven {
-            url “https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/”
+            url "https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/"
         }
         maven {
             url 'https://maven.google.com'
@@ -94,6 +102,8 @@ allprojects {
 ```
 
 Edit app/src/main/AndroidManifest.xml and set android:allowBackup="true"
+
+Location permission (`ACCESS_FINE_LOCATION`) must be granted by the user before positioning starts — on Android 14+ (targetSdkVersion 34) starting the positioning foreground service without granted location permission is rejected by the system. Handle the permission flow in your application (eg. with `react-native-permissions`) before calling `Proximiio.authorize()`.
 
 # Usage
 
