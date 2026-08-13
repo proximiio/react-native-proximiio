@@ -16,9 +16,12 @@ Welcome to the Proximi.io React Native Library, this library provides indoor pos
 
 # Version
 
-Current public version is: `5.3.5`
+Current public version is: `5.3.6`
 
 ## Changelog
+
+### 5.3.6
+- Android: compatibility with React Native 0.81+ (Kotlin bridge migration: updated `ActivityEventListener` override signatures, `currentActivity` accessed via `ReactApplicationContext`), required for targetSdk 36 / Android 16 builds; remains compatible with older React Native versions
 
 ### 5.3.5
 - Android: positioning is now properly restarted when the application returns to foreground, fixes crash (`ProximiioDatabase.saveInputID` NullPointerException) when using the SDK after the app was minimized and reopened
