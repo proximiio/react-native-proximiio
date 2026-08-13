@@ -84,14 +84,14 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
     @ReactMethod
     fun requestPermissions(alwaysPermission: Boolean = true, useBluetooth: Boolean = true) {
         this.useBluetooth = useBluetooth
-        permissionHelper.checkAndRequest(currentActivity!!, this,true, useBluetooth)
+        permissionHelper.checkAndRequest(reactContext.currentActivity!!, this,true, useBluetooth)
     }
 
     @ReactMethod
     fun checkAndRequestBluetooth(promise: Promise) {
         bluetoothDenied = false
         useBluetooth = true
-        permissionHelper.checkAndRequestBluetooth(currentActivity!!)
+        permissionHelper.checkAndRequestBluetooth(reactContext.currentActivity!!)
     }
 
     @ReactMethod
@@ -543,7 +543,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
             }
         })
         proximiioAPI!!.setAuth(auth!!, true)
-//        permissionHelper.checkAndRequest(currentActivity!!, this)
+//        permissionHelper.checkAndRequest(reactContext.currentActivity!!, this)
     }
 
     @ReactMethod
@@ -569,10 +569,10 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     override fun onHostResume() {
         proximiioAPI?.let {
-          it.setActivity(currentActivity)
+          it.setActivity(reactContext.currentActivity)
           it.onStart()
           it.pdrEnabled(pdrEnabled)
-          permissionHelper.checkAndRequest(currentActivity!!, this,
+          permissionHelper.checkAndRequest(reactContext.currentActivity!!, this,
               force = false,
               useBluetooth = shouldBluetooth()
           )
@@ -591,7 +591,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
         proximiioAPI?.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        permissionHelper.onPermissionResult(currentActivity!!, permissions, grantResults)
+        permissionHelper.onPermissionResult(reactContext.currentActivity!!, permissions, grantResults)
         return true
     }
 
@@ -624,8 +624,8 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
 
     @ReactMethod
     fun trySetActivity() {
-        (currentActivity as PermissionAwareActivity).requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), ProximiioAPI.PERMISSION_REQUEST, this);
-        proximiioAPI?.setActivity(currentActivity)
+        (reactContext.currentActivity as PermissionAwareActivity).requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), ProximiioAPI.PERMISSION_REQUEST, this);
+        proximiioAPI?.setActivity(reactContext.currentActivity)
         proximiioAPI?.onStart()
     }
 
@@ -642,7 +642,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         }
     }
 
-    override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
         if (!(requestCode == 114 && resultCode == 0)) {
             proximiioAPI?.onActivityResult(requestCode, resultCode, data)
         } else {
@@ -650,7 +650,7 @@ class RNProximiioReactModule internal constructor(private val reactContext: Reac
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {}
+    override fun onNewIntent(intent: Intent) {}
 
     @ReactMethod
     fun addListener(eventName: String?) {
